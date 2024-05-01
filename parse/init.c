@@ -301,6 +301,7 @@ char	**split_asterisk(char *s)
 	return (ret);
 }
 
+<<<<<<< HEAD
 int	have_quote(char *s)
 {
 	while (*s)
@@ -351,6 +352,8 @@ void	handle_noquote_dollar(char *s)
 	close(fd);
 }
 
+=======
+>>>>>>> 93181620050061d916770c1c4f5b236a9834a594
 void	set_arguments(t_cmd *tcmd)
 {
 	int		i;
@@ -368,10 +371,13 @@ void	set_arguments(t_cmd *tcmd)
 		{
 			handle_dollar(split_arg, i);
 		}
+<<<<<<< HEAD
 		else if (have_quote(split_arg[i]) == 0 && have_dollar_nonzero(split_arg[i]))
 		{
 			handle_noquote_dollar(split_arg[i]);
 		}
+=======
+>>>>>>> 93181620050061d916770c1c4f5b236a9834a594
 		copy_string_char(&tcmd->arg[i], split_arg[i], ft_strlen(split_arg[i]));
 		free(split_arg[i]);
 		i++;
