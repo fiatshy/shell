@@ -1,0 +1,306 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <sys/wait.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include "libft/libft.h"
+#include "parse_test.h"
+
+void	fork_and_execute(t_cmd_struct *tcst, int index)
+{
+	int	pid;
+	char	*command;
+	char	**env;
+
+	env = NULL;
+	//printf("%d %d %d\n", index, tcst->tcmd[index]->pipe_index, tcst->no_of_pipes);
+	pid = fork();
+	if (pid == 0)
+	{
+		if (tcst->tcmd[index]->pipe_index != -1)
+		{
+			if (tcst->tcmd[index]->pipe_index == 0) /* index와 연동되지 않음 */
+				set_pipe_head(tcst, tcst->tcmd[index]->pipe_index);
+			else if (tcst->tcmd[index]->pipe_index == tcst->no_of_pipes)
+				set_pipe_tail(tcst, tcst->tcmd[index]->pipe_index);
+			else
+				set_pipe_body(tcst, tcst->tcmd[index]->pipe_index);
+		}
+		command = ft_strjoin("/usr/bin/", \
+			tcst->tcmd[index]->arg[0]); /* stat 함수 추가 */
+		execve(command, tcst->tcmd[index]->arg, env);
+		return ;
+	}
+	else
+	{
+		if (tcst->tcmd[index]->pipe_index != -1)
+		{
+			if (tcst->tcmd[index]->pipe_index != 0)
+				close(tcst->tpipe[tcst->tcmd[index]->pipe_index - 1].fd[1]);
+		}
+		waitpid(0, &tcst->status, 0);
+	}
+}
+
+void	free_after_exectue(t_cmd_struct *tcst, int i, int *proceed)
+{
+	int	j;
+
+	j = 0;
+	if (i < tcst->n)
+	{
+		while (tcst->tcmd[i]->arg[j])
+		{
+			free(tcst->tcmd[i]->arg[j]);
+			j++;
+		}
+		free(tcst->tcmd[i]->arg);
+		*proceed = true;
+	}
+}
+
+int	check_grouping(t_cmd_struct *tcst, int *i, int *proceed)
+{
+	if (*i != 0)
+	{
+		if (ft_strncmp(tcst->tcmd[*i - 1]->next_delimiter, "||", 2) == 0)
+		{
+			/* proceed by check status */
+			if (tcst->status == 0)
+			{
+				*proceed = false;
+				/* if open discard till close i+= */
+				if (tcst->open)
+				{
+					*i += get_closed_index(tcst, *i);
+					tcst->open = 0;
+					return (-1);
+				}
+			}
+			else if (tcst->status != 0)
+			{
+				*proceed = true;
+			}
+		}
+		else if (ft_strncmp(tcst->tcmd[*i - 1]->next_delimiter, "&&", 2) == 0)
+		{
+			/* proceed by check status */
+			if (tcst->status == 0)
+			{
+				*proceed = true;
+			}
+			else if (tcst->status != 0)
+			{
+				*proceed = false;
+				/* if open discard till close i+= */
+				if (tcst->open)
+				{
+					*i += get_closed_index(tcst, *i);
+					tcst->open = 0;
+					return (-1);
+				}
+			}
+		}
+	}
+	return (0);
+}
+
+void	prepare_execute(t_cmd_struct *tcst)
+{
+	int		i;
+	int		j;
+	int		k;
+	int		l;
+	int		no_of_redirection;
+	int		proceed;
+	int		cont;
+	int		first = 1;
+
+	int	fd_read;
+	int	fd_write;
+	int	fd_append;
+	int	fd_tmp_write;
+	int	fd_tmp_read;
+
+	i = 0;
+	cont = 0;
+	proceed = 1;
+	while (i < tcst->n)
+	{
+		no_of_redirection = get_no_of_redirection(tcst->tcmd[i]);
+		if (no_of_redirection == 0)
+		{
+			set_arguments(tcst->tcmd[i]);
+			cont = check_grouping(tcst, &i, &proceed);
+			if (cont == -1)
+				continue;
+			if (proceed)
+				fork_and_execute(tcst, i);
+			free_after_exectue(tcst, i, &proceed);
+		}
+		else
+		{
+			//printf("%s\n", tcst->tcmd[i]->cmd);
+			char **split_redirection = ft_split_string(tcst->tcmd[i]->cmd, "<>");
+			j = 0;
+			char **args;
+			// args = malloc (sizeof(char *) * 10);
+			// ft_memset(args, 0, 10);
+
+			
+			while (split_redirection[j])
+			{
+				// //printf("%s\n", split_redirection[j]);
+				char **split_again = ft_split(split_redirection[j], ' ');
+				k = 0;
+				int	index = 0;
+				while (split_again[k])
+				{
+					// if (k != 0 && ft_strncmp(split_again[k - 1], "<", 1) && ft_strncmp(split_again[k - 1], ">", 1))
+					// {
+					// 	args[index] = malloc (sizeof(ft_strlen(split_again[k])));
+					// 	ft_memcpy(args[index], split_again[k], ft_strlen(split_again[k]));
+					// 	index += 1;
+						
+					// }
+					if (ft_strncmp(split_again[k], "<<", 2)== 0)
+					{
+						fd_tmp_write = open("tmp", O_CREAT | O_RDWR | O_TRUNC, 0777);
+						// dup2(fd_tmp_write, 1);
+						
+						char temp[100] = {0, };
+						while (1)
+						{
+							ft_memset(temp, 0, 100);
+							int r = read(0, temp, 100);
+							write(fd_tmp_write, temp, r);
+							if (ft_strncmp(temp, split_again[k + 1], ft_strlen(temp) - 1) == 0)
+							{
+								break;
+							}
+						}
+						close(fd_tmp_write);
+						fd_tmp_write = open("tmp", O_RDONLY);
+						dup2(fd_tmp_write, 0);
+					}
+					else if (ft_strncmp(split_again[k], "<", 1) == 0)
+					{
+						fd_read = open(split_again[k + 1], O_RDONLY, 0777);
+						dup2(fd_read, 0);
+					}
+					else if (ft_strncmp(split_again[k], ">>", 2) == 0)
+					{
+						fd_append = open(split_again[k + 1], O_WRONLY | O_CREAT | O_APPEND, 0777);
+						dup2(fd_append, 1);
+					}
+					else if (ft_strncmp(split_again[k], ">", 1) == 0)
+					{
+						fd_write = open(split_again[k + 1], O_WRONLY | O_CREAT, 0777);
+						// dup2(fd_write, 1);
+					}
+					//if previous is not redirection
+					k++;
+				}
+				l = 0;
+				while (l < k)
+				{
+					free(split_again[l]);
+					l++;
+				}
+				free(split_again);
+				j++;
+			}
+			l = 0;
+			while (l < j)
+			{
+				free(split_redirection[l]);
+				l++;
+			}
+			free(split_redirection);
+			// int pid = fork();
+			// if (pid == 0)
+			// {
+			// 	char *envs[] = {NULL};
+			// 	if (first)
+			// 	{
+			// 		dup2(fd_write, 1);
+			// 		first = false;
+			// 	}
+			// 	execve("/usr/bin/grep", args, envs);
+			// 	close(fd_write);
+			// 	// close(fd_append);
+			// 	// close(fd_read);
+			// 	close(fd_tmp_write);
+			// 	// close(fd_tmp_read);
+			// 	return ;
+			// }
+			// else
+			// {
+			// 	wait(NULL);
+			// 	close(fd_write);
+			// 	// close(fd_append);
+			// 	// close(fd_read);
+			// 	close(fd_tmp_write);
+			// 	// close(fd_tmp_read);
+			// }
+		}
+		i++;
+	}
+}
+
+void	free_all(t_cmd_struct *tcst, t_pipe *tp)
+{
+	int	i;
+
+	free(tp);
+	i = 0;
+	while (i < tcst->n)
+	{
+		free(tcst->tcmd[i]->cmd);
+		free(tcst->tcmd[i]);
+		i++;
+	}
+	free(tcst->tcmd);
+	free(tcst);
+}
+
+int	main(void)
+{
+	
+	t_cmd			**tcmd;
+	t_cmd_struct	*tcst;
+	t_pipe			*tp;
+	//char			*s;
+
+	//while (1)
+	//{
+	//	s = readline("shell $ ");
+	//	init_tcst(&tcst, s);
+	//	copy_string_char(&(tcst->s), s, ft_strlen(s));
+	//	init_tcmd(tcst);
+	//	tcst->no_of_pipes = get_no_of_pipes(tcst);
+	//	init_pipe(tcst, &tp);
+	//	prepare_execute(tcst);
+	//	free_all(tcst, tp);
+	//}
+
+	/* not solved*/
+	// ls -al | dude
+	// (ls -al || grep) hello
+	// (ls -al && grep shell) || ls vice versa
+
+	/* solved */
+	// ls -al && (ls -al | grep shell)
+	// (ls -al || grep ) && ls
+	// (ls -al && grep) || echo this
+	// < a grep a > b && ls
+
+	char			*s = "<< a grep aa > b | ls -al";
+	init_tcst(&tcst, s);
+	copy_string_char(&(tcst->s), s, ft_strlen(s));
+	init_tcmd(tcst);
+	tcst->no_of_pipes = get_no_of_pipes(tcst);
+	init_pipe(tcst, &tp);
+	prepare_execute(tcst);
+	free_all(tcst, tp);
+}
