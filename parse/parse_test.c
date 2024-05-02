@@ -460,7 +460,10 @@ int	fork_and_execute(t_cmd_struct *tcst, int index)
 	if (res == 2)
 		exit(0);
 	if (res == 3)
+	{
 		ft_cd(tcst, index);
+		return (0);
+	}
 	signal(SIGINT, handle_interrupt_blocked);
 	signal(SIGQUIT, handle_interrupt_blocked);
 	pid = fork();
@@ -491,7 +494,7 @@ int	fork_and_execute(t_cmd_struct *tcst, int index)
 		}
 		exit(0);
 	}
-	else
+	else if (res != 3)
 	{
 		waitpid(0, &tcst->status, 0);
 		fork_and_exectue_nested(tcst, index);
