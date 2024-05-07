@@ -1020,13 +1020,14 @@ int	main(void)
 	//char	*s = "test ../../../../../usr/bin/ls";
 	//char	*s = "cd ../../../../../../usr/bin/";
 	// char	*s = "ls | grep a*";
-
 	// char	*s = "echo there $USER is";
-	// init_tcst(&tcst, s, status);
-	// copy_string_char(&(tcst->s), s, ft_strlen(s));
-	// init_tcmd(tcst);
-	// tcst->no_of_pipes = get_no_of_pipes(tcst);
-	// init_pipe(tcst, &tp);
-	// prepare_execute(tcst);
-	// free_all(tcst, tp);
+
+	//char	*s = "echo 'there | you go'";
+	//init_tcst(&tcst, s, status);
+	//copy_string_char(&(tcst->s), s, ft_strlen(s));
+	//init_tcmd(tcst);
+	//tcst->no_of_pipes = get_no_of_pipes(tcst);
+	//init_pipe(tcst, &tp);
+	//prepare_execute(tcst);
+	//free_all(tcst, tp);
 }

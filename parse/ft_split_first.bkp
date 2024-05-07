@@ -24,7 +24,7 @@ size_t	count_words_first(char const *s, char c)
 	quote = false;
 	while (*(s + i))
 	{
-		if (*(s + i) == '"' || *(s + i) == '\'')
+		if (*(s + i) == '"')
 		{
 			if (quote)
 				quote = false;
@@ -76,9 +76,9 @@ size_t	count_length_first(char const *s, char c, size_t *i, bool *first)
 		// }
 		while (!delim && *(s + *i))
 		{
-			if (*(s + *i) == '"' || *(s + *i) == '\'' && !quote)
+			if (*(s + *i) == '"' && !quote)
 				quote = true;
-			else if (*(s + *i) == '"' || *(s + *i) == '\'' && quote)
+			else if (*(s + *i) == '"' && quote)
 				quote = false;
 			if (!quote)
 			{
@@ -130,9 +130,9 @@ char	**split_arr_first(char **split, char const *s, char c)
 		// 		c = '"';
 		// 	}
 		// }
-		if (*(s + i) == '"' ||*(s + i) == '\'')
+		if (*(s + i) == '"')
 			quote = true;
-		else if (*(s + i) == '"' || *(s + i) == '\'')
+		else if (*(s + i) == '"')
 			quote = false;
 		if (!has_delimiter_first(*(s + i)) && !quote)
 		{
