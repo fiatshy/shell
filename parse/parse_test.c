@@ -432,54 +432,70 @@ int	exec_builtin(t_cmd_struct *tcst, int index)
 	return (1);
 }
 
+int	handle_res(int *res, t_cmd_struct *tcst, int index)
+{
+	*res = is_builtin(tcst, index);
+	if (*res == 2)
+		exit(0);
+	if (*res == 3)
+	{
+		ft_cd(tcst, index);
+		return (1);
+	}
+	return (0);
+}
+
+void	handle_parent(int res, t_cmd_struct *tcst, int index)
+{
+	waitpid(0, &tcst->status, 0);
+	fork_and_exectue_nested(tcst, index);
+}
+
+void	fork_nested(int res, t_cmd_struct *tcst, int index)
+{
+	char	**env;
+	char	*command;
+
+	env = NULL;
+	if (res == 1)
+	{
+		exec_builtin(tcst, index);
+		exit(0);
+	}
+	else if (res == 0)
+	{
+		if (has_relative_path(tcst->tcmd[index]->arg[0]))
+			command = get_exectue_path(get_relative_path_exec(tcst, index));
+		else
+			command = get_exectue_path(tcst->tcmd[index]->arg[0]);
+		if (command == 0)
+			printf("Wrong command\n");
+		else
+		{
+			execve(command, tcst->tcmd[index]->arg, env);
+			exit(0);
+		}
+	}
+	exit(0);
+}
+
 int	fork_and_execute(t_cmd_struct *tcst, int index)
 {
 	int		pid;
 	char	*command;
-	char	**env;
 	int		res;
 
-	env = NULL;
-	res = is_builtin(tcst, index);
-	if (res == 2)
-		exit(0);
-	if (res == 3)
-	{
-		ft_cd(tcst, index);
-		return (0);
-	}
+	handle_res(&res, tcst, index);
 	signal(SIGINT, handle_interrupt_blocked);
 	signal(SIGQUIT, handle_interrupt_blocked);
 	pid = fork();
 	if (pid == 0)
 	{
 		set_tunnels(tcst, index);
-		if (res == 1)
-		{
-			exec_builtin(tcst, index);
-			exit(0);
-		}
-		else if (res == 0)
-		{
-			if (has_relative_path(tcst->tcmd[index]->arg[0]))
-				command = get_exectue_path(get_relative_path_exec(tcst, index));
-			else
-				command = get_exectue_path(tcst->tcmd[index]->arg[0]);
-			if (command == 0)
-				printf("Wrong command\n");
-			else
-			{
-				execve(command, tcst->tcmd[index]->arg, env);
-				exit(0);
-			}
-		}
-		exit(0);
+		fork_nested(res, tcst, index);
 	}
 	else if (res != 3)
-	{
-		waitpid(0, &tcst->status, 0);
-		fork_and_exectue_nested(tcst, index);
-	}
+		handle_parent(res, tcst, index);
 }
 
 void	free_after_exectue(t_cmd_struct *tcst, int i, int *proceed)
