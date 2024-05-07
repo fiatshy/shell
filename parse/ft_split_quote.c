@@ -12,50 +12,69 @@
 
 #include "parse_test.h"
 
+void	count_quote_nest_in_nest(size_t *words, char const *s, \
+	size_t *i, char c)
+{
+	(*words)++;
+	while (*(s + (*i)) != c && *(s + (*i)))
+	{
+		if (*(s + (*i)) == '"')
+			c = '"';
+		else if (*(s + (*i)) == '\'')
+			c = '\'';
+		(*i)++;
+	}
+}
+
+void	count_quote_nested(char c, char const *s, size_t *i, size_t *words)
+{
+	char	save;
+
+	if (c == '"')
+	{
+		c = save;
+		(*i)++;
+		(*words)--;
+	}
+	else if (c == '\'')
+	{
+		c = save;
+		(*i)++;
+		(*words)--;
+	}
+	if (*(s + (*i)) != c)
+		count_quote_nest_in_nest(words, s, i, c);
+	else
+		(*i)++;
+}
+
 size_t	count_words_quote(char const *s, char c)
 {
 	size_t	i;
 	size_t	words;
 	bool	quote;
 	char	save;
+
 	i = 0;
 	words = 0;
 	quote = false;
 	save = c;
 	while (*(s + i))
-	{
-		if (c == '"')
-		{
-			c = save;
-			i++;
-			words--;
-		}
-		else if (c == '\'')
-		{
-			c = save;
-			i++;
-			words--;
-		}
-		if (*(s + i) != c)
-		{
-			words++;
-			while (*(s + i) != c && *(s + i))
-			{
-				if (*(s + i) == '"')
-				{
-					c = '"';
-				}
-				else if (*(s + i) == '\'')
-				{
-					c = '\'';
-				}
-				i++;
-			}
-		}
-		else
-			i++;
-	}
+		count_quote_nested(c, s, &i, &words);
 	return (words);
+}
+
+void	count_length_quote_nested(char const *s, size_t *i, char *c, size_t *j)
+{
+	while (*(s + *i) != *c && *(s + *i))
+	{
+		if (*(s + *i) == '"')
+			*c = '"';
+		else if (*(s + *i) == '\'')
+			*c = '\'';
+		(*i)++;
+		(*j)++;
+	}
 }
 
 size_t	count_length_quote(char const *s, char c, size_t *i)
@@ -65,19 +84,7 @@ size_t	count_length_quote(char const *s, char c, size_t *i)
 
 	j = 0;
 	save = c;
-	while (*(s + *i) != c && *(s + *i))
-	{
-		if (*(s +*i) == '"')
-		{
-			c = '"';
-		}
-		else if (*(s +*i) == '\'')
-		{
-			c = '\'';
-		}
-		(*i)++;
-		j++;
-	}
+	count_length_quote_nested(s, i, &c, &j);
 	if (c == '"' || c == '\'')
 	{
 		c = save;
@@ -97,7 +104,7 @@ char	**split_arr_quote(char **split, char const *s, char c)
 	size_t	i;
 	size_t	j;
 	size_t	idx;
-	bool quote;
+	bool	quote;
 
 	i = 0;
 	idx = 0;

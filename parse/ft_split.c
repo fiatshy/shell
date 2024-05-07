@@ -13,6 +13,27 @@
 #include "newshell.h"
 #include "libft/libft.h"
 
+void	normal_split_nested(char const *s, char c, size_t *i, size_t *words)
+{
+	bool	quote;
+
+	if (*(s + *i) == '"')
+	{
+		if (quote)
+			quote = false;
+		else
+			quote = true;
+	}
+	if (*(s + *i) != c && !quote)
+	{
+		(*words)++;
+		while (*(s + *i) != c && *(s + *i))
+			(*i)++;
+	}
+	else
+		(*i)++;
+}
+
 size_t	count_words(char const *s, char c)
 {
 	size_t	i;
@@ -23,24 +44,7 @@ size_t	count_words(char const *s, char c)
 	words = 0;
 	quote = false;
 	while (*(s + i))
-	{
-		if (*(s + i) == '"')
-		{
-			if (quote)
-				quote = false;
-			else
-				quote = true;
-		}
-
-		if (*(s + i) != c && !quote)
-		{
-			words++;
-			while (*(s + i) != c && *(s + i))
-				i++;
-		}
-		else
-			i++;
-	}
+		normal_split_nested(s, c, &i, &words);
 	return (words);
 }
 
@@ -57,43 +61,54 @@ size_t	count_length(char const *s, char c, size_t *i)
 	return (j);
 }
 
-char	**split_arr(char **split, char const *s, char c)
+typedef struct s_split
 {
 	size_t	i;
 	size_t	j;
 	size_t	idx;
-	bool quote;
+	bool	quote;
+}				t_split;
 
-	i = 0;
-	idx = 0;
-	quote = false;
-	while (*(s + i))
+void	init_split(t_split *ts)
+{
+	ts->i = 0;
+	ts->idx = 0;
+	ts->quote = false;
+}
+
+void	split_arr_nested(char const *s, t_split ts, char *c)
+{
+	if (*(s + ts.i) == '"')
 	{
-		if (*(s + i) == '"')
+		if (ts.quote)
+			*c = ' ';
+		else
+			*c = '"';
+	}
+}
+
+char	**split_arr(char **split, char const *s, char c)
+{
+	t_split	ts;
+
+	init_split(&ts);
+	while (*(s + ts.i))
+	{
+		split_arr_nested(s, ts, &c);
+		if (*(s + ts.i) != c)
 		{
-			if (quote)
-			{
-				c = ' ';			
-			}
-			else
-			{
-				c = '"';
-			}
-		}
-		if (*(s + i) != c)
-		{
-			j = count_length(s, c, &i);
-			split[idx] = (char *) malloc (sizeof(char) * (j + 1));
-			if (split[idx] == 0)
+			ts.j = count_length(s, c, &ts.i);
+			split[ts.idx] = (char *) malloc (sizeof(char) * (ts.j + 1));
+			if (split[ts.idx] == 0)
 				return (0);
-			ft_memcpy(split[idx], s + i - j, j);
-			split[idx][j] = '\0';
-			idx++;
+			ft_memcpy(split[ts.idx], s + ts.i - ts.j, ts.j);
+			split[ts.idx][ts.j] = '\0';
+			ts.idx++;
 		}
 		else
-			i++;
+			ts.i++;
 	}
-	split[idx] = 0;
+	split[ts.idx] = 0;
 	return (split);
 }
 
@@ -108,10 +123,3 @@ char	**ft_split(char const *s, char c)
 	split_arr(split, s, c);
 	return (split);
 }
-
-// int	main(void)
-// {
-// 	char *s = "car \"ls -la\" hello";
-// 	char **split = ft_split(s, ' ');
-// 	printf("%s %s %s\n", split[0], split[1], split[2]);
-// }

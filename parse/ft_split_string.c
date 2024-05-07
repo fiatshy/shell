@@ -50,7 +50,7 @@ size_t	count_length_string(char const *s, char *c, size_t *i)
 	size_t	j;
 
 	j = 0;
-    while (!has_delimiters(s + *i, c) && *(s + *i))
+	while (!has_delimiters(s + *i, c) && *(s + *i))
 	{
 		(*i)++;
 		j++;
@@ -60,10 +60,13 @@ size_t	count_length_string(char const *s, char *c, size_t *i)
 
 char	*split_routine(size_t *i, char const *s, size_t *j, char *operand)
 {
-	size_t	k = 1;
-	size_t	l = 0;
-	size_t	cmp_index = 0;
+	size_t	k;
+	size_t	l;
+	size_t	cmp_index;
 
+	k = 1;
+	l = 0;
+	cmp_index = 0;
 	k = *i;
 	k--;
 	while (*(s + k) == ' ')
@@ -84,34 +87,44 @@ char	*split_routine(size_t *i, char const *s, size_t *j, char *operand)
 	return (operand);
 }
 
-char	**split_arr_string(char **split, char const *s, char *c)
+typedef struct s_str
 {
 	size_t	i;
 	size_t	j;
 	size_t	idx;
 	char	*operand;
-	
-	i = 0;
-	idx = 0;
-	operand = malloc (sizeof(char) * 4);
-	while (*(s + i))
+}			t_str;
+
+void	init_string(t_str *ts)
+{
+	ts->i = 0;
+	ts->idx = 0;
+	ts->operand = malloc (sizeof(char) * 4);
+}
+
+char	**split_arr_string(char **split, char const *s, char *c)
+{
+	t_str	ts;
+
+	init_string(&ts);
+	while (*(s + ts.i))
 	{
-		if (!has_delimiters(s + i, c))
+		if (!has_delimiters(s + ts.i, c))
 		{
-			split_routine(&i, s, &j, operand);
-			split[idx] = (char *) malloc (sizeof(char) * (j + 3 + 1));
-			if (split[idx] == 0)
+			split_routine(&ts.i, s, &ts.j, ts.operand);
+			split[ts.idx] = (char *) malloc (sizeof(char) * (ts.j + 3 + 1));
+			if (split[ts.idx] == 0)
 				return (0);
-			ft_memcpy(split[idx], operand, 3);
-			ft_memcpy(&split[idx][2], s + i - j, j);
-			split[idx][j + 2] = '\0';
-			idx++;
+			ft_memcpy(split[ts.idx], ts.operand, 3);
+			ft_memcpy(&split[ts.idx][2], s + ts.i - ts.j, ts.j);
+			split[ts.idx][ts.j + 2] = '\0';
+			ts.idx++;
 		}
 		else
-			i++;
+			ts.i++;
 	}
-	free(operand);
-	split[idx] = 0;
+	free(ts.operand);
+	split[ts.idx] = 0;
 	return (split);
 }
 

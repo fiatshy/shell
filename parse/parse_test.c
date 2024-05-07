@@ -958,7 +958,7 @@ int	is_empty_command(char s)
 
 void handle_quit()
 {
-    printf("hello");
+    //printf("hello");
 }
 
 int	check_if_ctrl_d(char *s)
