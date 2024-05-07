@@ -37,6 +37,31 @@ void	fork_and_exectue_nested(t_cmd_struct *tcst, int index)
 	}
 }
 
+char	*get_env(void)
+{
+	int	fd;
+	int	i;
+	char	*temp;
+	char	**split;
+
+	fd = open("environment", O_RDONLY);
+	temp = get_next_line(fd);
+	while (temp)
+	{
+		if (ft_strncmp(temp, "PATH", 4) == 0)
+		{
+			split = ft_split(temp, '=');
+			free(temp);
+			return (split[1]);
+		}
+		free(temp);
+		temp = get_next_line(fd);
+	}
+	free(temp);
+	close(fd);
+	return (NULL);
+}
+
 void	get_execute_path_nested(int *response, char *s, char **cmd_path)
 {
 	int			i;
@@ -44,9 +69,14 @@ void	get_execute_path_nested(int *response, char *s, char **cmd_path)
 	char		**split_path;
 	struct stat	buf;
 
-	path = getenv("PATH");
-	split_path = ft_split(path, ':');
+	path = get_env();
+	if (path != NULL)
+		split_path = ft_split(path, ':');
+	else
+		split_path = NULL;
 	i = 0;
+	if (path == NULL && split_path == NULL)
+		printf("Wrong Command\n");
 	while (split_path[i])
 	{
 		*cmd_path = ft_strjoin(split_path[i], "/");
@@ -61,7 +91,7 @@ void	get_execute_path_nested(int *response, char *s, char **cmd_path)
 }
 
 char	*get_exectue_path(char *s)
-{
+{	char	*split;
 	struct stat	buf;
 	char		*cmd_path;
 	int			response;
@@ -485,7 +515,8 @@ int	fork_and_execute(t_cmd_struct *tcst, int index)
 	char	*command;
 	int		res;
 
-	handle_res(&res, tcst, index);
+	if (handle_res(&res, tcst, index) == 1)
+		return (0);
 	signal(SIGINT, handle_interrupt_blocked);
 	signal(SIGQUIT, handle_interrupt_blocked);
 	pid = fork();
@@ -947,6 +978,7 @@ int	main(void)
 	t_cmd_struct	*tcst;
 	t_pipe			*tp;
 	int				status = 0;
+
 	char			*s;
 
 	signal(SIGINT, handle_interrupt);

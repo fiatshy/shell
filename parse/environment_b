@@ -1,8 +1,1 @@
-b=1
-
-c=2
-
-USER=sunghyki
-
-f=5
-
+PATH=/home/sunghyki/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
