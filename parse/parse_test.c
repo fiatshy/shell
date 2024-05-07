@@ -329,35 +329,30 @@ void	ft_export(t_cmd_struct *tcst, int index)
 	close(fd);
 }
 
-void	ft_unset(t_cmd_struct *tcst, int index)
+void	get_file_length(int *i)
 {
 	int		fd;
-	int		i;
 	char	*temp;
-	char	**arr;
-	char	**temp_split;
 
 	fd = open("environment", O_RDWR, 0777);
-	i = 0;
+	*i = 0;
 	temp = get_next_line(fd);
 	while (temp)
 	{
-		i++;
+		(*i)++;
 		temp = get_next_line(fd);
 		free(temp);
 	}
 	free(temp);
 	close(fd);
-	arr = malloc (sizeof(char *) * (i + 1));
-	i = 0;
-	fd = open("environment", O_RDWR, 0777);
-	arr[i] = get_next_line(fd);
-	while (arr[i])
-	{
-		i++;
-		arr[i] = get_next_line(fd);
-	}
-	close(fd);
+}
+
+void	write_env(char **arr, t_cmd_struct *tcst, int index)
+{
+	int		fd;
+	int		i;
+	char	**temp_split;
+
 	remove("environment");
 	fd = open("environment", O_CREAT | O_WRONLY, 0777);
 	i = 0;
@@ -375,57 +370,24 @@ void	ft_unset(t_cmd_struct *tcst, int index)
 	close(fd);
 }
 
-int	is_builtin_bkp(t_cmd_struct *tcst, int index)
+void	ft_unset(t_cmd_struct *tcst, int index)
 {
-	int	res;
+	int		fd;
+	int		i;
+	char	**arr;
 
-	res = 0;
-	if (ft_strncmp("echo", tcst->tcmd[index]->arg[0], 4) == 0)
+	get_file_length(&i);
+	arr = malloc (sizeof(char *) * (i + 1));
+	i = 0;
+	fd = open("environment", O_RDWR, 0777);
+	arr[i] = get_next_line(fd);
+	while (arr[i])
 	{
-		ft_echo(tcst, index);
-		res = 1;
+		i++;
+		arr[i] = get_next_line(fd);
 	}
-	else if (ft_strncmp("exit", tcst->tcmd[index]->arg[0], 4) == 0)
-	{
-		ft_exit();
-		res = 1;
-	}
-	else if (ft_strncmp("$?", tcst->tcmd[index]->arg[0], 2) == 0)
-	{
-		ft_status(tcst);
-		res = 1;
-	}
-	else if (ft_strncmp("pwd", tcst->tcmd[index]->arg[0], 3) == 0)
-	{
-		ft_pwd(tcst);
-		res = 1;
-	}
-	else if (ft_strncmp("cd", tcst->tcmd[index]->arg[0], 3) == 0)
-	{
-		ft_cd(tcst, index);
-		res = 1;
-	}
-	else if (ft_strncmp("env", tcst->tcmd[index]->arg[0], 3) == 0)
-	{
-		ft_env();
-		res = 1;
-	}
-	else if (ft_strncmp("export", tcst->tcmd[index]->arg[0], 6) == 0)
-	{
-		ft_export(tcst, index);
-		res = 1;
-	}
-	else if (ft_strncmp("unset", tcst->tcmd[index]->arg[0], 5) == 0)
-	{
-		ft_unset(tcst, index);
-		res = 1;
-	}
-	else if (ft_strncmp("test", tcst->tcmd[index]->arg[0], 4) == 0)
-	{
-		printf("%s\n", get_relative_path(tcst, index));
-		res = 1;
-	}
-	return (res);
+	close(fd);
+	write_env(arr, tcst, index);
 }
 
 int	is_builtin(t_cmd_struct *tcst, int index)
@@ -766,6 +728,15 @@ void	set_tunnel_redirect(t_cmd_struct *tcst, int index)
 	}
 }
 
+
+void	redirect_parents(t_cmd_struct *tcst, int index)
+{
+	waitpid(0, &tcst->status, 0);
+	close_fds(tcst);
+	if (index < tcst->no_of_pipes)
+		close(tcst->tpipe[index].fd[1]);
+}
+
 void	execute_redirection(t_cmd_struct *tcst, int first, int index)
 {
 	int		pid;
@@ -787,12 +758,7 @@ void	execute_redirection(t_cmd_struct *tcst, int first, int index)
 		return ;
 	}
 	else
-	{
-		waitpid(0, &tcst->status, 0);
-		close_fds(tcst);
-		if (index < tcst->no_of_pipes)
-			close(tcst->tpipe[index].fd[1]);
-	}
+		redirect_parents(tcst, index);
 	close_fds(tcst);
 	free_redirect_all(tcst);
 }
@@ -903,8 +869,6 @@ void	prepare_execute(t_cmd_struct *tcst)
 			handle_redirection(tcst, i);
 		i++;
 	}
-	signal(SIGINT, handle_interrupt);
-	signal(SIGQUIT, SIG_IGN);
 }
 
 int	free_all(t_cmd_struct *tcst, t_pipe *tp)
@@ -966,14 +930,11 @@ int	main(void)
 	t_cmd			**tcmd;
 	t_cmd_struct	*tcst;
 	t_pipe			*tp;
-	
 	int				status = 0;
-	//char			buf[255];
 	char			*s;
 
 	signal(SIGINT, handle_interrupt);
 	signal(SIGQUIT, SIG_IGN); //SIGIGN reverse slash
-
 	while (1)
 	{
 		s = readline("shell $ ");
@@ -988,6 +949,8 @@ int	main(void)
 		tcst->no_of_pipes = get_no_of_pipes(tcst);
 		init_pipe(tcst, &tp);
 		prepare_execute(tcst);
+		signal(SIGINT, handle_interrupt);
+		signal(SIGQUIT, SIG_IGN);
 		status = free_all(tcst, tp);
 	}
 
