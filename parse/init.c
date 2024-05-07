@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sunghyki <sunghyki@student.42gyeongsa      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/05/07 09:21:08 by sunghyki          #+#    #+#             */
+/*   Updated: 2024/05/07 09:21:11 by sunghyki         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "parse_test.h"
 
 void	init_fds(t_cmd_struct *tcst)
@@ -325,7 +337,7 @@ int	have_dollar_nonzero(char *s)
 
 void	handle_noquote_dollar(char *s)
 {
-	int	fd;
+	int		fd;
 	char	*input;
 	char	**split_env;
 
@@ -339,7 +351,7 @@ void	handle_noquote_dollar(char *s)
 			free(s);
 			s = malloc (ft_strlen(split_env[1]) + 1);
 			ft_memcpy(s, split_env[1], ft_strlen(split_env[1]));
-			s[ft_strlen(split_env[1])- 1] = 0;
+			s[ft_strlen(split_env[1]) - 1] = 0;
 		}
 		free(split_env[0]);
 		free(split_env[1]);
@@ -365,10 +377,9 @@ void	set_arguments(t_cmd *tcmd)
 	while (split_arg[i])
 	{
 		if (has_double_quote(split_arg[i]))
-		{
 			handle_dollar(split_arg, i);
-		}
-		else if (have_quote(split_arg[i]) == 0 && have_dollar_nonzero(split_arg[i]))
+		else if (have_quote(split_arg[i]) == 0 && \
+			have_dollar_nonzero(split_arg[i]))
 		{
 			handle_noquote_dollar(split_arg[i]);
 		}

@@ -1,20 +1,31 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_test.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sunghyki <sunghyki@student.42gyeongsa      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/05/07 09:22:14 by sunghyki          #+#    #+#             */
+/*   Updated: 2024/05/07 09:22:21 by sunghyki         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "libft/libft.h"
 #include "parse_test.h"
 
-void handle_interrupt()
+void	handle_interrupt(int fill)
 {
-    printf("\n");
-    rl_on_new_line();
-    rl_replace_line("", 0);
-    rl_redisplay();
+	printf("\n");
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
-void handle_interrupt_blocked()
+void	handle_interrupt_blocked(int fill)
 {
-    printf("\n");
-    rl_on_new_line();
-    rl_replace_line("", 0);
+	printf("\n");
+	rl_on_new_line();
+	rl_replace_line("", 0);
 }
 
 void	fork_and_exectue_nested(t_cmd_struct *tcst, int index)
@@ -43,7 +54,7 @@ void	get_execute_path_nested(int *response, char *s, char **cmd_path)
 		if (stat(*cmd_path, &buf) == 0)
 		{
 			*response = 1;
-			break;
+			break ;
 		}
 		i++;
 	}
@@ -81,6 +92,16 @@ void	set_tunnels(t_cmd_struct *tcst, int index)
 	}
 }
 
+void	trim(t_cmd_struct *tcst, int index, int i)
+{
+	char	*temp;
+
+	temp = ft_strtrim(tcst->tcmd[index]->arg[i], "\"");
+	temp = ft_strtrim(temp, "\'");
+	printf("%s ", temp);
+	free(temp);
+}
+
 void	ft_echo(t_cmd_struct *tcst, int index)
 {
 	char	*temp;
@@ -91,9 +112,7 @@ void	ft_echo(t_cmd_struct *tcst, int index)
 		i = 2;
 		while (tcst->tcmd[index]->arg[i])
 		{
-			temp = ft_strtrim(tcst->tcmd[index]->arg[i], "\"");
-			temp = ft_strtrim(temp, "\'");
-			printf("%s ", temp);
+			trim(tcst, index, i);
 			i++;
 		}
 	}
@@ -102,9 +121,7 @@ void	ft_echo(t_cmd_struct *tcst, int index)
 		i = 1;
 		while (tcst->tcmd[index]->arg[i])
 		{
-			temp = ft_strtrim(tcst->tcmd[index]->arg[i], "\"");
-			temp = ft_strtrim(temp, "\'");
-			printf("%s ", temp);
+			trim(tcst, index, i);
 			i++;
 		}
 		printf("\n");
@@ -210,7 +227,6 @@ char	*get_relative_path(t_cmd_struct *tcst, int index)
 	char	**split_slash;
 	char	cwd[255];
 	int		slash_length;
-	int		ret_length;
 	char	*ret_string;
 
 	split_slash = ft_split(tcst->tcmd[index]->arg[1], '/');
@@ -285,15 +301,21 @@ void	ft_cd(t_cmd_struct *tcst, int index)
 
 int	ft_env(void)
 {
-	extern char	**environ;
-	int			i;
+	int		fd;
+	int		i;
+	char	*temp;
 
+	fd = open("environment", O_RDONLY);
 	i = 0;
-	while (environ[i])
+	temp = get_next_line(fd);
+	while (temp)
 	{
-		printf("%s\n", environ[i]);
-		i++;
+		printf("%s", temp);
+		free(temp);
+		temp = get_next_line(fd);
 	}
+	free(temp);
+	close(fd);
 	return (0);
 }
 
@@ -478,10 +500,7 @@ int	fork_and_execute(t_cmd_struct *tcst, int index)
 		else if (res == 0)
 		{
 			if (has_relative_path(tcst->tcmd[index]->arg[0]))
-			{
-
 				command = get_exectue_path(get_relative_path_exec(tcst, index));
-			}
 			else
 				command = get_exectue_path(tcst->tcmd[index]->arg[0]);
 			if (command == 0)
