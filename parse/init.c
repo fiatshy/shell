@@ -467,6 +467,27 @@ void	init_tcmd_set_openclose(t_cmd_struct *tcst, char **split, int i)
 		tcst->tcmd[i]->close = true;
 }
 
+void	show_env_list(t_list **lst_env)
+{
+	t_list	*temp;
+
+	temp = *lst_env;
+	while (temp)
+	{
+		printf("%s\n", (char *)temp->content);
+		temp = temp->next;
+	}
+}
+
+void	init_env(t_list **lst_env)
+{
+	extern char **environ;
+
+	while (*environ)
+		ft_lstadd_back(lst_env, ft_lstnew(*environ++));
+	//show_env_list(lst_env);
+}
+
 void	init_tcmd(t_cmd_struct *tcst)
 {
 	int		i;
@@ -494,7 +515,7 @@ void	init_tcmd(t_cmd_struct *tcst)
 	}
 }
 
-void	init_pipe(t_cmd_struct *tcst, t_pipe **tp)
+void	init_pipe(t_cmd_struct *tcst)
 {
 	int	i;
 

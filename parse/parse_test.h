@@ -52,6 +52,7 @@ typedef struct  s_cmd_struct
 	int			open;
 	char		*s;
 	char		*current;
+	t_list		**lst_env;
 	int			tfd_index[4];
 	t_cmd		**tcmd;
 	t_fds		tfd[10];
@@ -77,7 +78,9 @@ int		get_length_of_args(char **split_arg);
 void	set_arguments(t_cmd *tcmd);
 void	init_tcst(t_cmd_struct **tcst, char *s, int status);
 void	init_tcmd(t_cmd_struct *tcst);
-void	init_pipe(t_cmd_struct *tcst, t_pipe **tp);
+void	init_pipe(t_cmd_struct *tcst);
+void	init_env(t_list **lst_env);
+void	show_env_list(t_list **lst_env);
 
 /* pipe */
 void	set_pipe_head(t_cmd_struct *tcst, int cmd_index);

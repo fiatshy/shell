@@ -19,7 +19,10 @@ t_list	*ft_lstnew(void	*content)
 	temp = (t_list *) malloc (sizeof(t_list));
 	if (temp == 0)
 		return (0);
-	temp->content = content;
+	//temp->content = content;
+	temp->content = malloc (ft_strlen((const char *)content) + 1);
+	ft_memcpy(temp->content, content, ft_strlen((const char *)content) + 1);
+	//temp->content[ft_strlen((const char *)content)] = 0;
 	temp->next = 0;
 	return (temp);
 }
