@@ -997,8 +997,8 @@ int	main(void)
 		tcst->no_of_pipes = get_no_of_pipes(tcst);
 		init_pipe(tcst, &tp);
 		prepare_execute(tcst);
-		signal(SIGINT, handle_interrupt);
-		signal(SIGQUIT, SIG_IGN);
+		//signal(SIGINT, handle_interrupt);
+		//signal(SIGQUIT, SIG_IGN);
 		status = free_all(tcst, tp);
 	}
 
