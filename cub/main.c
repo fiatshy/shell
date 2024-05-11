@@ -381,8 +381,7 @@ int	main(void)
 	tx.plane[0] = 1;
 	tx.plane[1] = 0;
 
-	//tx.plane[0] = -0.5;
-	//tx.plane[1] = 0.86;
+	//testing
 
 	tx.map = map;
 
