@@ -1,1 +1,0 @@
-gcc *.c libft/libft.a libmlx.a libmlx_Linux.a -lX11 -lXext -lm -o cub
