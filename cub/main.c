@@ -3,16 +3,20 @@
 #include "libft/libft.h"
 #include "main.h"
 
-#define UP		65362
-#define	DOWN	65364
-#define LEFT	65361
-#define	RIGHT	65363
+#define UP		119
+#define	DOWN	115
+#define LEFT	97
+#define	RIGHT	100
+#define LEFT_ARROW	65361
+#define	RIGHT_ARROW	65363
 #define	SPACE	32
 #define	BG		0x00000000
 #define RED_DOT 0x00FF0000
 #define	BOX		0x00FFFFFF
 #define	WIDTH	400
 #define	HEIGHT	400
+#define	MINI_WIDTH		100
+#define MINIT_HEIGHT	100
 #define MAP_WIDTH	5
 #define	MAP_HEIGHT	5
 #define	SPEED	3
@@ -103,6 +107,11 @@ int	draw_line(t_mlx *tx, int begin_x, int begin_y, int end_x, int end_y, int col
 	}
 }
 
+void	*control_key_release(int keycode, t_mlx *tx)
+{
+	printf("%d\n", keycode);
+}
+
 void	*control_keys(int keycode, t_mlx *tx)
 {
 	double	temp;
@@ -111,15 +120,15 @@ void	*control_keys(int keycode, t_mlx *tx)
 	{
 		if (tx->pos[1] - SPEED >= 0)
 		{
-			draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
-			draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
-			tx->pos[0] += tx->dir[0] * 20;
-			tx->pos[1] -= tx->dir[1] * 20;
-			// tx->pos_arr[0] += tx->dir[0] * 0.3;
-			tx->pos_arr[1] -= tx->dir[1] * 0.25;
-			printf(" UP %f %f\n", tx->pos_arr[0], tx->pos_arr[1]);
-			put_pixel(tx->img, tx->pos[0], tx->pos[1], RED_DOT);
-			mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->img->img, 0, 0);
+			//draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
+			//draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
+			tx->pos[0] += tx->dir[0] * 5;
+			tx->pos[1] -= tx->dir[1] * 5;
+			tx->pos_arr[0] += tx->dir[0] * 0.05;
+			tx->pos_arr[1] -= tx->dir[1] * 0.05;
+			//printf(" UP %f %f %f %f\n", tx->pos[0], tx->pos[1], tx->pos_arr[0], tx->pos_arr[1]);
+			//put_pixel(tx->img, tx->pos[0], tx->pos[1], RED_DOT);
+			//mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->img->img, 0, 0);
 		}
 		else
 			tx->pos[1] = 0;
@@ -128,23 +137,41 @@ void	*control_keys(int keycode, t_mlx *tx)
 	{
 		if (tx->pos[1] + SPEED <= HEIGHT)
 		{
-			draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
-			draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
-			tx->pos[0] += tx->dir[0] * 20;
-			tx->pos[1] += tx->dir[1] * 20;
-			// tx->pos_arr[0] += tx->dir[0] * 0.3;
-			tx->pos_arr[1] += tx->dir[1] * 0.25;
-			printf("DOWN %f %f\n", tx->pos_arr[0], tx->pos_arr[1]);
-			put_pixel(tx->img, tx->pos[0], tx->pos[1], RED_DOT);
-			mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->img->img, 0, 0);
+			//draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
+			//draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
+			tx->pos[0] -= tx->dir[0] * 5;
+			tx->pos[1] += tx->dir[1] * 5;
+			tx->pos_arr[0] -= tx->dir[0] * 0.05;
+			tx->pos_arr[1] += tx->dir[1] * 0.05;
+			//printf("DOWN %f %f %f %f\n", tx->pos[0], tx->pos[1], tx->pos_arr[0], tx->pos_arr[1]);
+			//put_pixel(tx->img, tx->pos[0], tx->pos[1], RED_DOT);
+			//mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->img->img, 0, 0);
 		}
 		else
 			tx->pos[1] = HEIGHT - 1;
 	}
 	else if (keycode == LEFT)
 	{
-		draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
-		draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
+		float	orthogonal[2];
+		float	i = -1.57;
+
+		orthogonal[0] = tx->dir[0] * cos(-1 * i) - tx->dir[1] * sin(-1 * i);
+		orthogonal[1] = tx->dir[0] * sin(-1 * i) + tx->dir[1] * cos(-1 * i);
+		tx->pos_arr[0] += orthogonal[0] * 0.05;
+		tx->pos_arr[1] -= orthogonal[1] * 0.05;
+	}
+	else if (keycode == RIGHT)
+	{
+		float	orthogonal[2];
+		float	i = -1.57;
+
+		orthogonal[0] = tx->dir[0] * cos(i) - tx->dir[1] * sin(i);
+		orthogonal[1] = tx->dir[0] * sin(i) + tx->dir[1] * cos(i);
+		tx->pos_arr[0] += orthogonal[0] * 0.05;
+		tx->pos_arr[1] -= orthogonal[1] * 0.05;
+	}
+	else if (keycode == LEFT_ARROW)
+	{
 		temp = tx->dir[0];
 		tx->dir[0] = tx->dir[0] * cos(-1 * ROTATE_AMT) - tx->dir[1] * sin(-1 * ROTATE_AMT);
 		tx->dir[1] = temp * sin(-1 * ROTATE_AMT) + tx->dir[1] * cos(-1 * ROTATE_AMT);
@@ -153,10 +180,8 @@ void	*control_keys(int keycode, t_mlx *tx)
 		tx->plane[0] = tx->plane[0] * cos(-1 * ROTATE_AMT) - tx->plane[1] * sin(-1 * ROTATE_AMT);
 		tx->plane[1] = temp * sin(-1 * ROTATE_AMT) + tx->plane[1] * cos(-1 * ROTATE_AMT);
 	}
-	else if (keycode == RIGHT)
+	else if (keycode == RIGHT_ARROW)
 	{
-		draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
-		draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
 		temp = tx->dir[0];
 		tx->dir[0] = tx->dir[0] * cos(ROTATE_AMT) - tx->dir[1] * sin(ROTATE_AMT);
 		tx->dir[1] = temp * sin(ROTATE_AMT) + tx->dir[1] * cos(ROTATE_AMT);
@@ -196,10 +221,10 @@ void	fill_minimap(void *data)
 	i = 0;
 	j = 0;
 	tx = data;
-	while (i < 100)
+	while (i < MINIT_HEIGHT)
 	{
 		j = 0;
-		while (j < 100)
+		while (j < MINI_WIDTH)
 			put_pixel(tx->img, i, j++, BG);
 		i++;
 	}
@@ -239,7 +264,7 @@ void	fill_minimap_init(void *data)
 	int		pixel_per_value;
 
 	tx = data;
-	pixel_per_value = 100 / MAP_WIDTH; // 100 / 2 = 50
+	pixel_per_value = MINI_WIDTH / MAP_WIDTH; // 100 / 2 = 50
 	i = 0;
 	while (i < MAP_HEIGHT)
 	{
@@ -346,10 +371,40 @@ void	render_frame(void *data)
 	}
 	fill_minimap(tx);
 	fill_minimap_init(tx);
-	// put_pixel(tx->img, tx->pos[0], tx->pos[1], 0x00FF0000);
-	// draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
-	// draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
+	put_pixel(tx->img, tx->pos[0], tx->pos[1], 0x00FF0000);
+	 draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
+	 draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
 	mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->img->img, 0, 0);
+}
+
+int	control_mouse(int x, int y, void *param)
+{
+	float temp = 0.01;
+	float test;
+	t_mlx *tx = param;
+	static int	oldx;
+	if (oldx < x)
+	{
+		test = tx->dir[0];
+		tx->dir[0] = tx->dir[0] * cos(-1 * temp) - tx->dir[1] * sin(-1 * temp);
+		tx->dir[1] = test * sin(-1 * temp) + tx->dir[1] * cos(-1 * temp);
+
+		test = tx->plane[0];
+		tx->plane[0] = tx->plane[0] * cos(-1 * temp) - tx->plane[1] * sin(-1 * temp);
+		tx->plane[1] = test * sin(-1 * temp) + tx->plane[1] * cos(-1 * temp);
+	}
+	else if (oldx >= x)
+	{
+		test = tx->dir[0];
+		tx->dir[0] = tx->dir[0] * cos(temp) - tx->dir[1] * sin(temp);
+		tx->dir[1] = test * sin(temp) + tx->dir[1] * cos(temp);
+
+		test = tx->plane[0];
+		tx->plane[0] = tx->plane[0] * cos(temp) - tx->plane[1] * sin(temp);
+		tx->plane[1] = test * sin(temp) + tx->plane[1] * cos(temp);
+	}
+	oldx = x;
+	
 }
 
 int	main(void)
@@ -367,7 +422,7 @@ int	main(void)
 	};
 
 	tx.pos[0] = 50;
-	tx.pos[1] = 80;
+	tx.pos[1] = 75;
 
 	tx.pos_arr[0] = 2.5;
 	tx.pos_arr[1] = 4;
@@ -395,10 +450,11 @@ int	main(void)
 	tx.img = &img;
 
 
-	
-	
+	mlx_hook(tx.mlx_win, 2, 1L << 0, control_keys, (void *)&tx);
+	mlx_hook(tx.mlx_win, 6, 1L << 6, control_mouse, (void *)&tx);
 	mlx_loop_hook(tx.mlx, render_frame, (void *)&tx);
-	mlx_key_hook(tx.mlx_win, control_keys, (void *)&tx);
+	//mlx_key_hook(tx.mlx_win, control_keys, (void *)&tx);
+	mlx_mouse_hook(tx.mlx_win, control_mouse, &tx);
 	mlx_loop(tx.mlx);
 	return (0);
 }
