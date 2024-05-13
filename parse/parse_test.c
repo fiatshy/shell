@@ -140,12 +140,27 @@ void	set_tunnels(t_cmd_struct *tcst, int index)
 	}
 }
 
+char	*what_quotes(char *s)
+{
+	while (*s)
+	{
+		if (*s == '\"')
+			return ("\"");
+		else if (*s == '\'')
+			return ("\'");
+		s++;
+	}
+	return (NULL);
+}
+
 void	trim(t_cmd_struct *tcst, int index, int i)
 {
 	char	*temp;
+	char	*delim;
 
-	temp = ft_strtrim(tcst->tcmd[index]->arg[i], "\"");
-	temp = ft_strtrim(temp, "\'");
+	delim = what_quotes(tcst->tcmd[index]->arg[i]);
+	temp = ft_strtrim(tcst->tcmd[index]->arg[i], delim);
+	temp = ft_strtrim(temp, delim);
 	printf("%s ", temp);
 	free(temp);
 }
