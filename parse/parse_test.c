@@ -159,9 +159,15 @@ void	trim(t_cmd_struct *tcst, int index, int i)
 	char	*delim;
 
 	delim = what_quotes(tcst->tcmd[index]->arg[i]);
-	temp = ft_strtrim(tcst->tcmd[index]->arg[i], delim);
-	temp = ft_strtrim(temp, delim);
-	printf("%s ", temp);
+	
+	if (delim == NULL)
+		printf("%s ", tcst->tcmd[index]->arg[i]);
+	else
+	{
+		// temp = ft_strtrim(tcst->tcmd[index]->arg[i], delim);
+		// temp = ft_strtrim(temp, delim);
+		printf("%s ", tcst->tcmd[index]->arg[i]);
+	}
 	free(temp);
 }
 
@@ -928,7 +934,7 @@ void	prepare_execute(t_cmd_struct *tcst)
 		no_of_redirection = get_no_of_redirection(tcst->tcmd[i]);
 		if (no_of_redirection == 0)
 		{
-			set_arguments(tcst->tcmd[i]);
+			set_arguments(tcst->tcmd[i], tcst);
 			cont = check_grouping(tcst, &i, &proceed);
 			if (cont == -1)
 				continue ;

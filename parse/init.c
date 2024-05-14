@@ -76,32 +76,47 @@ int	space_after_dollar(char *string)
 			return (i);
 		i++;
 	}
-	return (i);
+	return (0);
 }
 
-char	**split_environ(char *string, int s, int e)
+void	split_environ(char *string, int s, int e, char temp[4][100])
 {
-	char	**temp;
-	int		len;
+	int		idx = 0;
+	int		cnt = 0;
 
-	if (e <= 0)
-		e = 5;
-	temp = malloc (sizeof(char *) * 4);
-	temp[0] = malloc (s + 1);
-	ft_memcpy(temp[0], string, s);
-	temp[0][s] = 0;
-	temp[1] = malloc (e + 1);
-	ft_memcpy(temp[1], string + s + 1, e - 1);
-	temp[1][e - 1] = 0;
-	len = ft_strlen(string);
-	temp[2] = malloc (len - (s + e) + 1);
-	ft_memcpy(temp[2], string + s + e, len - (s + e));
-	temp[2][len - (s + e)] = 0;
-	temp[3] = 0;
-	return (temp);
+	ft_memset(temp[0], 0, 100);
+	while (*(string + idx))
+	{
+		if (*(string + idx) == '$')
+		{
+			break;
+		}
+		temp[0][idx] = *(string + idx);
+		idx++;
+	}
+	temp[0][idx] = 0;
+	idx++;
+	while (*(string + idx))
+	{
+		if (*(string + idx) == '\'' || *(string + idx) == '\"' || *(string + idx) == ' ')
+			break ;
+		temp[1][cnt] = *(string + idx);
+		idx++;
+		cnt++;
+	}
+	temp[1][cnt] = 0;
+	cnt = 0;
+	while (*(string + idx))
+	{
+		temp[2][cnt] = *(string + idx);
+		idx++;
+		cnt++;
+	}
+	temp[2][cnt] = 0;
+	temp[3][0] = 0;
 }
 
-void	handle_dollar_compare(char **split_env, \
+void	handle_dollar_compare(char split_env[4][100], \
 	char **split_arg, int i, char **split_env_input)
 {
 	char	*result_string;
@@ -114,7 +129,7 @@ void	handle_dollar_compare(char **split_env, \
 		ft_strlen(split_env[2]) + ft_strlen(split_env_input[1]));
 	front_len = ft_strlen(split_env[0]);
 	ft_memcpy(result_string, split_env[0], front_len);
-	env_len = ft_strlen(split_env_input[1]) - 1;
+	env_len = ft_strlen(split_env_input[1]);
 	ft_memcpy(result_string + front_len, split_env_input[1], env_len);
 	end_len = ft_strlen(split_env[2]);
 	ft_memcpy(result_string + front_len + env_len, split_env[2], end_len);
@@ -138,51 +153,42 @@ void	free_env_input(char **split_env_input)
 	free(split_env_input);
 }
 
-void	handle_dollar_nested(char **split_env, char **split_arg, int i, int j)
+void	handle_dollar_nested(char split_env[4][100], char **split_arg, int i, t_cmd_struct *tcst)
 {
-	int		fd;
-	char	*input;
 	char	**split_env_input;
-	char	*result_string;
-	char	*remove_quote;
+	t_list	*temp;
+	t_list	*prev;
 
-	fd = open("environment", O_RDONLY, 0777);
-	input = get_next_line(fd);
-	while (input != NULL)
+	prev = NULL;
+	temp = *tcst->lst_env;
+	while (temp)
 	{
-		split_env_input = ft_split(input, '=');
+		split_env_input = ft_split(temp->content, '=');
 		if (ft_strncmp(split_env[1], split_env_input[0], \
 			ft_strlen(split_env_input[0])) == 0)
+		{
 			handle_dollar_compare(split_env, split_arg, i, split_env_input);
+			break ;
+		}
 		free_env_input(split_env_input);
-		free(input);
-		input = get_next_line(fd);
+		temp = temp->next;
 	}
-	free(input);
-	close(fd);
 }
 
-void	handle_dollar(char **split_arg, int i)
+void	handle_dollar(char **split_arg, int i, t_cmd_struct	*tcst)
 {
 	int		result;
 	int		dollar;
 	int		space;
-	char	**split_env;
+	char	split_env[4][100];
 	int		j;
 
 	result = is_double_is_outer(split_arg[i]);
 	dollar = has_dollar(split_arg[i]);
 	space = space_after_dollar(split_arg[i] + dollar);
-	split_env = split_environ(split_arg[i], dollar, space);
+	split_environ(split_arg[i], dollar, space, split_env);
 	if (result && dollar)
-		handle_dollar_nested(split_env, split_arg, i, j);
-	j = 0;
-	while (split_env[j])
-	{
-		free(split_env[j]);
-		j++;
-	}
-	free(split_env);
+		handle_dollar_nested(split_env, split_arg, i, tcst);
 }
 
 int	has_asterisk(char *s)
@@ -335,35 +341,34 @@ int	have_dollar_nonzero(char *s)
 	return (0);
 }
 
-void	handle_noquote_dollar(char *s)
+void	handle_noquote_dollar(char **s, t_cmd_struct *tcst)
 {
-	int		fd;
-	char	*input;
 	char	**split_env;
+	t_list	*temp;
+	t_list	*prev;
 
-	fd = open("environment", O_RDONLY, 0644);
-	input = get_next_line(fd);
-	while (input)
+	prev = NULL;
+	temp = *tcst->lst_env;
+	(*s) = ft_strtrim((*s), "$");
+	while (temp)
 	{
-		split_env = ft_split(input, '=');
-		if (ft_strncmp(split_env[0], s + 1, ft_strlen(s + 1)) == 0)
+		if (ft_strncmp(temp->content, *s, ft_strlen(*s)) == 0)
 		{
-			free(s);
-			s = malloc (ft_strlen(split_env[1]) + 1);
-			ft_memcpy(s, split_env[1], ft_strlen(split_env[1]));
-			s[ft_strlen(split_env[1]) - 1] = 0;
+			split_env = ft_split(temp->content, '=');
+			free(*s);
+			*s = malloc (ft_strlen(split_env[1]) + 1);
+			ft_memcpy(*s, split_env[1], ft_strlen(split_env[1]));
+			(*s)[ft_strlen(split_env[1])] = 0;
+			free(split_env[0]);
+			free(split_env[1]);
+			free(split_env);
+			break ;
 		}
-		free(split_env[0]);
-		free(split_env[1]);
-		free(split_env);
-		free(input);
-		input = get_next_line(fd);
+		temp = temp->next;
 	}
-	free(input);
-	close(fd);
 }
 
-void	set_arguments(t_cmd *tcmd)
+void	set_arguments(t_cmd *tcmd, t_cmd_struct *tcst)
 {
 	int		i;
 	char	**split_arg;
@@ -377,11 +382,11 @@ void	set_arguments(t_cmd *tcmd)
 	while (split_arg[i])
 	{
 		if (has_double_quote(split_arg[i]))
-			handle_dollar(split_arg, i);
+			handle_dollar(split_arg, i, tcst);
 		else if (have_quote(split_arg[i]) == 0 && \
 			have_dollar_nonzero(split_arg[i]))
 		{
-			handle_noquote_dollar(split_arg[i]);
+			handle_noquote_dollar(&split_arg[i], tcst);
 		}
 		copy_string_char(&tcmd->arg[i], split_arg[i], ft_strlen(split_arg[i]));
 		free(split_arg[i]);

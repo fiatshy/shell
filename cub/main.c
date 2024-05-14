@@ -13,14 +13,24 @@
 #define	BG		0x00000000
 #define RED_DOT 0x00FF0000
 #define	BOX		0x00FFFFFF
-#define	WIDTH	400
-#define	HEIGHT	400
+#define	WIDTH	640
+#define	HEIGHT	640
 #define	MINI_WIDTH		100
 #define MINIT_HEIGHT	100
 #define MAP_WIDTH	5
 #define	MAP_HEIGHT	5
 #define	SPEED	3
 #define	ROTATE_AMT	25
+#define	TEXTURE_WIDTH 20
+#define	TEXTURE_HEIGHT 20
+
+typedef struct s_texture
+{
+	char	*tex_path;
+	int		*texture;
+	double	width;
+	double	height;
+}			t_texture;
 
 typedef struct s_img
 {
@@ -40,7 +50,9 @@ typedef	struct s_mlx
 	double		pos_arr[2];
 	double		dir[2];
 	double		plane[2];
+	int			(*texture)[8][TEXTURE_HEIGHT * TEXTURE_WIDTH];
 	int			(*map)[MAP_WIDTH];
+	int			*addr;
 }				t_mlx;
 
 double	abs_double(double x)
@@ -372,9 +384,22 @@ void	render_frame(void *data)
 	fill_minimap(tx);
 	fill_minimap_init(tx);
 	put_pixel(tx->img, tx->pos[0], tx->pos[1], 0x00FF0000);
-	 draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
-	 draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
+	int	idx = 0;
+	for (int j = 0; j < 64; j++)
+	{
+		for (int i = 0; i < 64; i++)
+		{
+			put_pixel(tx->img, i * 2 , j * 2  , tx->addr[(int)(64 * j + i)]);
+			put_pixel(tx->img, i * 2 , j * 2 + 1, tx->addr[(int)(64 * j + i)]);
+			put_pixel(tx->img, i * 2 + 1, j * 2, tx->addr[(int)(64 * j + i)]);
+			put_pixel(tx->img, i * 2 + 1, j * 2 + 1, tx->addr[(int)(64 * j + i)]);
+		}
+	}
+	
+	//draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
+	//draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
 	mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->img->img, 0, 0);
+	//mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->temp_img, 0, 0);
 }
 
 int	control_mouse(int x, int y, void *param)
@@ -421,6 +446,10 @@ int	main(void)
 		{1, 1, 1, 1, 1}
 	};
 
+	int	texture[8][TEXTURE_HEIGHT * TEXTURE_WIDTH];
+
+	tx.texture = &texture;
+
 	tx.pos[0] = 50;
 	tx.pos[1] = 75;
 
@@ -448,8 +477,11 @@ int	main(void)
 								&img.endian);
 
 	tx.img = &img;
-
-
+	t_img	temp_img;
+	int	xpm_width;
+	int	xpm_height;
+	void	*img_ptr = mlx_xpm_file_to_image(tx.mlx, "mossy.xpm", &xpm_width, &xpm_height);
+	tx.addr = (int *)mlx_get_data_addr(img_ptr, &temp_img.bits_per_pixel, &temp_img.line_length, &temp_img.endian);
 	mlx_hook(tx.mlx_win, 2, 1L << 0, control_keys, (void *)&tx);
 	mlx_hook(tx.mlx_win, 6, 1L << 6, control_mouse, (void *)&tx);
 	mlx_loop_hook(tx.mlx, render_frame, (void *)&tx);
