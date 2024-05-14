@@ -143,9 +143,19 @@ void	copy_string(t_cmd **tcmd, char *src, int len)
 
 void	copy_string_char(char **s, char *src, int len)
 {
+	int		i;
+	char	delim;
 	(*s) = malloc (len +1);
 	ft_memcpy((*s), src, len);
 	(*s)[len] = 0;
+	i = 0;
+	if ((*s)[0] == '\'' | (*s)[0] == '\"')
+	{
+		delim = (*s)[0];
+		if ((*s)[len - 1] == delim)
+			*s = ft_strtrim(*s, &delim);
+	}
+
 }
 
 int	get_no_of_pipes(t_cmd_struct *tcst)

@@ -79,26 +79,15 @@ int	space_after_dollar(char *string)
 	return (0);
 }
 
-void	split_environ(char *string, int s, int e, char temp[4][100])
+void	split_envirion_nested(char *string, int idx, char temp[4][100])
 {
-	int		idx = 0;
-	int		cnt = 0;
+	int	cnt;
 
-	ft_memset(temp[0], 0, 100);
+	cnt = 0;
 	while (*(string + idx))
 	{
-		if (*(string + idx) == '$')
-		{
-			break;
-		}
-		temp[0][idx] = *(string + idx);
-		idx++;
-	}
-	temp[0][idx] = 0;
-	idx++;
-	while (*(string + idx))
-	{
-		if (*(string + idx) == '\'' || *(string + idx) == '\"' || *(string + idx) == ' ')
+		if (*(string + idx) == '\'' || \
+			*(string + idx) == '\"' || *(string + idx) == ' ')
 			break ;
 		temp[1][cnt] = *(string + idx);
 		idx++;
@@ -114,6 +103,28 @@ void	split_environ(char *string, int s, int e, char temp[4][100])
 	}
 	temp[2][cnt] = 0;
 	temp[3][0] = 0;
+}
+
+void	split_environ(char *string, int s, int e, char temp[4][100])
+{
+	int		idx;
+	int		cnt;
+
+	idx = 0;
+	cnt = 0;
+	ft_memset(temp[0], 0, 100);
+	while (*(string + idx))
+	{
+		if (*(string + idx) == '$')
+		{
+			break ;
+		}
+		temp[0][idx] = *(string + idx);
+		idx++;
+	}
+	temp[0][idx] = 0;
+	idx++;
+	split_envirion_nested(string, idx, temp);
 }
 
 void	handle_dollar_compare(char split_env[4][100], \
@@ -134,10 +145,8 @@ void	handle_dollar_compare(char split_env[4][100], \
 	end_len = ft_strlen(split_env[2]);
 	ft_memcpy(result_string + front_len + env_len, split_env[2], end_len);
 	result_string[front_len + env_len + end_len] = 0;
-	remove_quote = ft_strtrim(result_string, "\"");
-	free(result_string);
 	free(split_arg[i]);
-	split_arg[i] = remove_quote;
+	split_arg[i] = result_string;
 }
 
 void	free_env_input(char **split_env_input)
@@ -153,12 +162,23 @@ void	free_env_input(char **split_env_input)
 	free(split_env_input);
 }
 
-void	handle_dollar_nested(char split_env[4][100], char **split_arg, int i, t_cmd_struct *tcst)
+void	handle_flag(char **split_arg, int i)
+{
+	free(split_arg[i]);
+	split_arg[i] = malloc (2);
+	split_arg[i][0] = ' ';
+	split_arg[i][1] = 0;
+}
+
+void	handle_dollar_nested(char split_env[4][100], \
+	char **split_arg, int i, t_cmd_struct *tcst)
 {
 	char	**split_env_input;
 	t_list	*temp;
 	t_list	*prev;
+	int		flag;
 
+	flag = true;
 	prev = NULL;
 	temp = *tcst->lst_env;
 	while (temp)
@@ -167,12 +187,15 @@ void	handle_dollar_nested(char split_env[4][100], char **split_arg, int i, t_cmd
 		if (ft_strncmp(split_env[1], split_env_input[0], \
 			ft_strlen(split_env_input[0])) == 0)
 		{
+			flag = false;
 			handle_dollar_compare(split_env, split_arg, i, split_env_input);
 			break ;
 		}
 		free_env_input(split_env_input);
 		temp = temp->next;
 	}
+	if (flag)
+		handle_flag(split_arg, i);
 }
 
 void	handle_dollar(char **split_arg, int i, t_cmd_struct	*tcst)
@@ -341,12 +364,41 @@ int	have_dollar_nonzero(char *s)
 	return (0);
 }
 
+void	free_noquote_dollar(char **split_env)
+{
+	free(split_env[0]);
+	free(split_env[1]);
+	free(split_env);
+}
+
+void	noquote_nested(char **s, t_list *temp)
+{
+	char	**split_env;
+
+	split_env = ft_split(temp->content, '=');
+	free(*s);
+	*s = malloc (ft_strlen(split_env[1]) + 1);
+	ft_memcpy(*s, split_env[1], ft_strlen(split_env[1]));
+	(*s)[ft_strlen(split_env[1])] = 0;
+	free_noquote_dollar(split_env);
+}
+
+void	make_blank_string(char **s)
+{
+	free(*s);
+	(*s) = malloc (2);
+	(*s)[0] = ' ';
+	(*s)[1] = 0;
+}
+
 void	handle_noquote_dollar(char **s, t_cmd_struct *tcst)
 {
 	char	**split_env;
 	t_list	*temp;
 	t_list	*prev;
+	int		flag;
 
+	flag = true;
 	prev = NULL;
 	temp = *tcst->lst_env;
 	(*s) = ft_strtrim((*s), "$");
@@ -354,30 +406,19 @@ void	handle_noquote_dollar(char **s, t_cmd_struct *tcst)
 	{
 		if (ft_strncmp(temp->content, *s, ft_strlen(*s)) == 0)
 		{
-			split_env = ft_split(temp->content, '=');
-			free(*s);
-			*s = malloc (ft_strlen(split_env[1]) + 1);
-			ft_memcpy(*s, split_env[1], ft_strlen(split_env[1]));
-			(*s)[ft_strlen(split_env[1])] = 0;
-			free(split_env[0]);
-			free(split_env[1]);
-			free(split_env);
+			flag = false;
+			noquote_nested(s, temp);
 			break ;
 		}
 		temp = temp->next;
 	}
+	if (flag)
+		make_blank_string(s);
 }
 
-void	set_arguments(t_cmd *tcmd, t_cmd_struct *tcst)
+void	set_arguments_nested(t_cmd *tcmd, int i, \
+	t_cmd_struct *tcst, char **split_arg)
 {
-	int		i;
-	char	**split_arg;
-
-	i = 0;
-	if (has_asterisk(tcmd->cmd) == 1)
-		split_arg = split_asterisk(tcmd->cmd);
-	else
-		split_arg = ft_split_quote(tcmd->cmd, ' ');
 	tcmd->arg = malloc (sizeof(char *) * (get_length_of_args(split_arg) + 1));
 	while (split_arg[i])
 	{
@@ -385,9 +426,7 @@ void	set_arguments(t_cmd *tcmd, t_cmd_struct *tcst)
 			handle_dollar(split_arg, i, tcst);
 		else if (have_quote(split_arg[i]) == 0 && \
 			have_dollar_nonzero(split_arg[i]))
-		{
 			handle_noquote_dollar(&split_arg[i], tcst);
-		}
 		copy_string_char(&tcmd->arg[i], split_arg[i], ft_strlen(split_arg[i]));
 		free(split_arg[i]);
 		i++;
@@ -395,6 +434,24 @@ void	set_arguments(t_cmd *tcmd, t_cmd_struct *tcst)
 	if (i != 0)
 		tcmd->arg[i] = 0;
 	free(split_arg);
+}
+
+int	set_arguments(t_cmd *tcmd, t_cmd_struct *tcst)
+{
+	int		i;
+	char	**split_arg;
+
+	i = 0;
+	if (has_asterisk(tcmd->cmd) == 1)
+	{
+		split_arg = split_asterisk(tcmd->cmd);
+		if (split_arg[1] == 0)
+			return (-1);
+	}
+	else
+		split_arg = ft_split_quote(tcmd->cmd, ' ');
+	set_arguments_nested(tcmd, i, tcst, split_arg);
+	return (0);
 }
 
 void	init_tcst(t_cmd_struct **tcst, char *s, int status)
@@ -486,11 +543,10 @@ void	show_env_list(t_list **lst_env)
 
 void	init_env(t_list **lst_env)
 {
-	extern char **environ;
+	extern char	**environ;
 
 	while (*environ)
 		ft_lstadd_back(lst_env, ft_lstnew(*environ++));
-	//show_env_list(lst_env);
 }
 
 void	init_tcmd(t_cmd_struct *tcst)

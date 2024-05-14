@@ -39,8 +39,8 @@ void	fork_and_exectue_nested(t_cmd_struct *tcst, int index)
 
 char	*get_env(void)
 {
-	int	fd;
-	int	i;
+	int		fd;
+	int		i;
 	char	*temp;
 	char	**split;
 
@@ -80,14 +80,15 @@ char	*get_envv(t_cmd_struct *tcst)
 	return (NULL);
 }
 
-void	get_execute_path_nested(int *response, char *s, char **cmd_path, t_cmd_struct *tcst)
+void	get_execute_path_nested(int *response, \
+	char *s, char **cmd_path, t_cmd_struct *tcst)
 {
 	int			i;
 	char		*path;
 	char		**split_path;
 	struct stat	buf;
 
-	path = get_envv(tcst);;
+	path = get_envv(tcst);
 	if (path != NULL)
 		split_path = ft_split(path, ':');
 	else
@@ -109,7 +110,8 @@ void	get_execute_path_nested(int *response, char *s, char **cmd_path, t_cmd_stru
 }
 
 char	*get_exectue_path(char *s, t_cmd_struct *tcst)
-{	char	*split;
+{	
+	char		*split;
 	struct stat	buf;
 	char		*cmd_path;
 	int			response;
@@ -159,16 +161,20 @@ void	trim(t_cmd_struct *tcst, int index, int i)
 	char	*delim;
 
 	delim = what_quotes(tcst->tcmd[index]->arg[i]);
-	
 	if (delim == NULL)
-		printf("%s ", tcst->tcmd[index]->arg[i]);
+	{
+		if (tcst->tcmd[index]->arg[i][0] == '?')
+			printf("%d ", tcst->status);
+		else
+			printf("%s ", tcst->tcmd[index]->arg[i]);
+	}
 	else
 	{
-		// temp = ft_strtrim(tcst->tcmd[index]->arg[i], delim);
-		// temp = ft_strtrim(temp, delim);
-		printf("%s ", tcst->tcmd[index]->arg[i]);
+		if (tcst->tcmd[index]->arg[i][0] == '?')
+			printf("%d ", tcst->status);
+		else
+			printf("%s ", tcst->tcmd[index]->arg[i]);
 	}
-	free(temp);
 }
 
 void	ft_echo(t_cmd_struct *tcst, int index)
@@ -199,7 +205,7 @@ void	ft_echo(t_cmd_struct *tcst, int index)
 
 void	ft_exit(void)
 {
-	/* implement exit */
+	printf("exit\n");
 }
 
 void	ft_status(t_cmd_struct *tcst)
@@ -375,7 +381,31 @@ int	ft_env(t_cmd_struct *tcst)
 
 void	ft_export(t_cmd_struct *tcst, int index)
 {
-	ft_lstadd_back(tcst->lst_env, ft_lstnew(tcst->tcmd[index]->arg[1]));
+	t_list	*temp;
+	t_list	*prev;
+	char	**split_env;
+	int		flag;
+
+	prev = NULL;
+	flag = true;
+	temp = *tcst->lst_env;
+	while (temp)
+	{
+		split_env = ft_split(tcst->tcmd[index]->arg[1], '=');
+		if (ft_strncmp(temp->content, split_env[0], \
+			ft_strlen(split_env[0])) == 0)
+		{
+			free(temp->content);
+			temp->content = malloc (ft_strlen(tcst->tcmd[index]->arg[1]) + 1);
+			ft_memcpy(temp->content, tcst->tcmd[index]->arg[1], \
+				ft_strlen(tcst->tcmd[index]->arg[1]) + 1);
+			flag = false;
+			break ;
+		}
+		temp = temp->next;
+	}
+	if (flag)
+		ft_lstadd_back(tcst->lst_env, ft_lstnew(tcst->tcmd[index]->arg[1]));
 }
 
 void	ft_unset(t_cmd_struct *tcst, int index)
@@ -387,7 +417,8 @@ void	ft_unset(t_cmd_struct *tcst, int index)
 	temp = *tcst->lst_env;
 	while (temp)
 	{
-		if (ft_strncmp(temp->content, tcst->tcmd[index]->arg[1], ft_strlen(tcst->tcmd[index]->arg[1])) == 0)
+		if (ft_strncmp(temp->content, tcst->tcmd[index]->arg[1], \
+			ft_strlen(tcst->tcmd[index]->arg[1])) == 0)
 		{
 			prev->next = temp->next;
 			free(temp->content);
@@ -447,7 +478,7 @@ int	is_builtin(t_cmd_struct *tcst, int index)
 	else if (ft_strncmp("exit", tcst->tcmd[index]->arg[0], 4) == 0)
 		return (2);
 	else if (ft_strncmp("$?", tcst->tcmd[index]->arg[0], 2) == 0)
-		return (1);
+		return (6);
 	else if (ft_strncmp("pwd", tcst->tcmd[index]->arg[0], 3) == 0)
 		return (1);
 	else if (ft_strncmp("cd", tcst->tcmd[index]->arg[0], 3) == 0)
@@ -482,17 +513,9 @@ int	exec_builtin(t_cmd_struct *tcst, int index)
 	return (1);
 }
 
-int	handle_res(int *res, t_cmd_struct *tcst, int index)
+int	handle_res_nested(int *res, t_cmd_struct *tcst, int index)
 {
-	*res = is_builtin(tcst, index);
-	if (*res == 2)
-		exit(0);
-	else if (*res == 3)
-	{
-		ft_cd(tcst, index);
-		return (1);
-	}
-	else if (*res == 4)
+	if (*res == 4)
 	{
 		ft_export(tcst, index);
 		return (1);
@@ -502,7 +525,28 @@ int	handle_res(int *res, t_cmd_struct *tcst, int index)
 		ft_unset(tcst, index);
 		return (1);
 	}
+	else if (*res == 6)
+	{
+		ft_status(tcst);
+		return (1);
+	}
 	return (0);
+}
+
+int	handle_res(int *res, t_cmd_struct *tcst, int index)
+{
+	*res = is_builtin(tcst, index);
+	if (*res == 2)
+	{
+		printf("exit\n");
+		exit(0);
+	}
+	else if (*res == 3)
+	{
+		ft_cd(tcst, index);
+		return (1);
+	}
+	return (handle_res_nested(res, tcst, index));
 }
 
 void	handle_parent(int res, t_cmd_struct *tcst, int index)
@@ -525,7 +569,8 @@ void	fork_nested(int res, t_cmd_struct *tcst, int index)
 	else if (res == 0)
 	{
 		if (has_relative_path(tcst->tcmd[index]->arg[0]))
-			command = get_exectue_path(get_relative_path_exec(tcst, index), tcst);
+			command = get_exectue_path(\
+				get_relative_path_exec(tcst, index), tcst);
 		else
 			command = get_exectue_path(tcst->tcmd[index]->arg[0], tcst);
 		if (command == 0)
@@ -805,7 +850,6 @@ void	set_tunnel_redirect(t_cmd_struct *tcst, int index)
 	}
 }
 
-
 void	redirect_parents(t_cmd_struct *tcst, int index)
 {
 	waitpid(0, &tcst->status, 0);
@@ -904,22 +948,82 @@ void	handle_redirection_nested(t_cmd_struct *tcst, int j)
 	free_redirection(tcst, j);
 }
 
-void	handle_redirection(t_cmd_struct *tcst, int i)
+int	check_wrong_redirection(char *s)
+{
+	while (*s)
+	{
+		if (*s == '<' || *s == '>')
+		{
+			if (*(s + 1) == '<' || *(s + 1) == '>')
+			{
+				if (*(s + 2) != ' ')
+				{
+					printf("Wrong Command\n");
+					return (-1);
+				}
+			}
+			else
+			{
+				if (*(s + 1) != ' ')
+				{
+					printf("Wrong Command\n");
+					return (-1);
+				}
+			}
+		}
+		s++;
+	}
+	return (0);
+}
+
+int	handle_redirection(t_cmd_struct *tcst, int i)
 {
 	int		j;
 	int		k;
 	int		first;
 	int		index;
+	char	*s;
 
 	tcst->trst = malloc (sizeof(t_red_struct));
 	tcst->trst->split_redirection = ft_split(tcst->tcmd[i]->cmd, '=');
+	s = tcst->trst->split_redirection[0];
+	if (check_wrong_redirection(s) == -1)
+		return (-1);
 	j = 0;
 	tcst->trst->args = malloc (sizeof(char *) * 2);
 	handle_redirection_nested(tcst, j);
 	execute_redirection(tcst, first, i);
+	return (0);
 }
 
-void	prepare_execute(t_cmd_struct *tcst)
+int	prepare_execute_nested(t_cmd_struct *tcst, int i, int proceed, int cont)
+{
+	int	no_of_redirection;
+
+	while (i < tcst->n)
+	{
+		no_of_redirection = get_no_of_redirection(tcst->tcmd[i]);
+		if (no_of_redirection == 0)
+		{
+			if (set_arguments(tcst->tcmd[i], tcst) == -1)
+				return (0);
+			cont = check_grouping(tcst, &i, &proceed);
+			if (cont == -1)
+				continue ;
+			if (proceed)
+				fork_and_execute(tcst, i);
+			free_after_exectue(tcst, i, &proceed);
+		}
+		else
+		{
+			if (handle_redirection(tcst, i) == -1)
+				return (0);
+		}
+		i++;
+	}
+}
+
+int	prepare_execute(t_cmd_struct *tcst)
 {
 	int		i;
 	int		no_of_redirection;
@@ -929,23 +1033,9 @@ void	prepare_execute(t_cmd_struct *tcst)
 	i = 0;
 	cont = 0;
 	proceed = 1;
-	while (i < tcst->n)
-	{
-		no_of_redirection = get_no_of_redirection(tcst->tcmd[i]);
-		if (no_of_redirection == 0)
-		{
-			set_arguments(tcst->tcmd[i], tcst);
-			cont = check_grouping(tcst, &i, &proceed);
-			if (cont == -1)
-				continue ;
-			if (proceed)
-				fork_and_execute(tcst, i);
-			free_after_exectue(tcst, i, &proceed);
-		}
-		else
-			handle_redirection(tcst, i);
-		i++;
-	}
+	if (prepare_execute_nested(tcst, i, proceed, cont) == 0)
+		return (0);
+	return (0);
 }
 
 int	free_all(t_cmd_struct *tcst)
@@ -953,7 +1043,6 @@ int	free_all(t_cmd_struct *tcst)
 	int	i;
 	int	temp;
 
-	//free(tp);
 	i = 0;
 	temp = tcst->status;
 	while (i < tcst->n)
@@ -962,7 +1051,6 @@ int	free_all(t_cmd_struct *tcst)
 		free(tcst->tcmd[i]);
 		i++;
 	}
-	//free(tcst->tfd);
 	free(tcst->tcmd);
 	free(tcst);
 	return (temp);
@@ -986,11 +1074,6 @@ int	is_empty_command(char s)
 	return (0);
 }
 
-void handle_quit()
-{
-    //printf("hello");
-}
-
 int	check_if_ctrl_d(char *s)
 {
 	while (*s)
@@ -1006,7 +1089,6 @@ int	main(void)
 {
 	t_cmd			**tcmd;
 	t_cmd_struct	*tcst;
-	//t_pipe			*tp;
 	t_list			**lst_env;
 	int				status = 0;
 	bool			first = true;
@@ -1016,7 +1098,7 @@ int	main(void)
 	lst_env = malloc (sizeof(t_list *));
 	init_env(lst_env);
 	signal(SIGINT, handle_interrupt);
-	signal(SIGQUIT, SIG_IGN); //SIGIGN reverse slash
+	signal(SIGQUIT, SIG_IGN); 
 	while (1)
 	{
 		s = readline("shell $ ");
@@ -1034,7 +1116,6 @@ int	main(void)
 		prepare_execute(tcst);
 		signal(SIGINT, handle_interrupt);
 		signal(SIGQUIT, SIG_IGN);
-		//show_env_list(tcst->lst_env);
 		status = free_all(tcst);
 	}
 

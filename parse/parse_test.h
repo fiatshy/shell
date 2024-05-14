@@ -75,7 +75,7 @@ int		get_no_of_redirection(t_cmd *t);
 int		get_length_of_args(char **split_arg);
 
 /* init */
-void	set_arguments(t_cmd *tcmd, t_cmd_struct *tcst);
+int		set_arguments(t_cmd *tcmd, t_cmd_struct *tcst);
 void	init_tcst(t_cmd_struct **tcst, char *s, int status);
 void	init_tcmd(t_cmd_struct *tcst);
 void	init_pipe(t_cmd_struct *tcst);
