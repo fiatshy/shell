@@ -367,9 +367,7 @@ void	ft_cd(t_cmd_struct *tcst, int index)
 
 	getcwd(buf, 255);
 	if (has_relative_path(tcst->tcmd[index]->arg[1]))
-	{
 		chdir(get_relative_path(tcst, index));
-	}
 	else
 		chdir(tcst->tcmd[index]->arg[1]);
 }
@@ -517,6 +515,11 @@ int	handle_res_nested(int *res, t_cmd_struct *tcst, int index)
 {
 	if (*res == 4)
 	{
+		if (tcst->tcmd[index]->arg[1] == NULL)
+		{
+			show_env_list(tcst->lst_env);
+			return (1);
+		}
 		ft_export(tcst, index);
 		return (1);
 	}
@@ -992,6 +995,11 @@ int	handle_redirection(t_cmd_struct *tcst, int i)
 	j = 0;
 	tcst->trst->args = malloc (sizeof(char *) * 2);
 	handle_redirection_nested(tcst, j);
+	if (open(tcst->trst->args[1], O_RDONLY) == -1)
+	{
+		printf("No such file\n");
+		return (0);
+	}
 	execute_redirection(tcst, first, i);
 	return (0);
 }

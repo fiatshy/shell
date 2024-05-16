@@ -391,6 +391,14 @@ void	make_blank_string(char **s)
 	(*s)[1] = 0;
 }
 
+void	make_question_mark(char **s)
+{
+	free(*s);
+	(*s) = malloc (2);
+	(*s)[0] = '?';
+	(*s)[1] = 0;
+}
+
 void	handle_noquote_dollar(char **s, t_cmd_struct *tcst)
 {
 	char	**split_env;
@@ -402,6 +410,11 @@ void	handle_noquote_dollar(char **s, t_cmd_struct *tcst)
 	prev = NULL;
 	temp = *tcst->lst_env;
 	(*s) = ft_strtrim((*s), "$");
+	if ((*s)[0] == '?')
+	{
+		make_question_mark(s);
+		return ;
+	}
 	while (temp)
 	{
 		if (ft_strncmp(temp->content, *s, ft_strlen(*s)) == 0)
