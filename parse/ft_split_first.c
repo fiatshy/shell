@@ -22,9 +22,9 @@ int	count_length_first_nested(char const *s, size_t *i, size_t *j, bool *first)
 	quote = false;
 	while (!delim && *(s + *i))
 	{
-		if (*(s + *i) == '"' || *(s + *i) == '\'' && !quote)
+		if ((*(s + *i) == '"' || *(s + *i) == '\'') && !quote)
 			quote = true;
-		else if (*(s + *i) == '"' || *(s + *i) == '\'' && quote)
+		else if ((*(s + *i) == '"' || *(s + *i) == '\'') && quote)
 			quote = false;
 		if (!quote)
 		{
