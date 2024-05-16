@@ -752,6 +752,7 @@ void	handle_redirect_delim(t_cmd_struct *tcst, int k)
 
 void	handle_redirect_output(t_cmd_struct *tcst, int k)
 {
+	struct stat	buf;
 	if (ft_strncmp(tcst->trst->split_again[k], ">>", 2) == 0)
 	{
 		tcst->tfd[tcst->tfd_index[2]].append = \
@@ -761,6 +762,8 @@ void	handle_redirect_output(t_cmd_struct *tcst, int k)
 	}
 	else if (ft_strncmp(tcst->trst->split_again[k], ">", 1) == 0)
 	{
+		if (stat(tcst->trst->split_again[k + 1], &buf) == 0)
+			remove(tcst->trst->split_again[k + 1]);
 		tcst->tfd[tcst->tfd_index[3]].write = \
 			open(tcst->trst->split_again[k + 1], \
 				O_WRONLY | O_CREAT, 0777);
@@ -1003,11 +1006,11 @@ int	handle_redirection(t_cmd_struct *tcst, int i)
 	j = 0;
 	tcst->trst->args = malloc (sizeof(char *) * 2);
 	handle_redirection_nested(tcst, j);
-	if (open(tcst->trst->args[1], O_RDONLY) == -1)
-	{
-		printf("No such file\n");
-		return (0);
-	}
+	//if (open(tcst->trst->args[1], O_RDONLY) == -1)
+	//{
+	//	printf("No such file\n");
+	//	return (0);
+	//}
 	execute_redirection(tcst, first, i);
 	return (0);
 }
