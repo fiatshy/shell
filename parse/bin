@@ -1,1 +1,1 @@
-gcc parse_test.c get_next_line.c get_next_line_utils.c init.c util.c pipe.c ft_split_string.c ft_split_quote.c ft_split_first.c  libft/libft.a -lreadline
+gcc parse_test.c get_next_line.c get_next_line_utils.c init.c util.c pipe.c ft_split_string.c ft_split_quote.c ft_split_first.c ft_split_string_nested.c ft_split_quote_nested.c ft_split_first_nested.c libft/libft.a -lreadline

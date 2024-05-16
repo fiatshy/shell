@@ -8,6 +8,7 @@
 		"stat.h": "c",
 		"types.h": "c",
 		"signal.h": "c",
-		"parse_test.h": "c"
+		"parse_test.h": "c",
+		"refactor": "c"
 	}
 }

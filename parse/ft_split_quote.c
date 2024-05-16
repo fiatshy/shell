@@ -12,71 +12,6 @@
 
 #include "parse_test.h"
 
-void	count_quote_nest_in_nest(size_t *words, char const *s, \
-	size_t *i, char c)
-{
-	(*words)++;
-	while (*(s + (*i)) != c && *(s + (*i)))
-	{
-		if (*(s + (*i)) == '"')
-			c = '"';
-		else if (*(s + (*i)) == '\'')
-			c = '\'';
-		(*i)++;
-	}
-}
-
-void	count_quote_nested(char c, char const *s, size_t *i, size_t *words)
-{
-	char	save;
-
-	if (c == '"')
-	{
-		c = save;
-		(*i)++;
-		(*words)--;
-	}
-	else if (c == '\'')
-	{
-		c = save;
-		(*i)++;
-		(*words)--;
-	}
-	if (*(s + (*i)) != c)
-		count_quote_nest_in_nest(words, s, i, c);
-	else
-		(*i)++;
-}
-
-size_t	count_words_quote(char const *s, char c)
-{
-	size_t	i;
-	size_t	words;
-	bool	quote;
-	char	save;
-
-	i = 0;
-	words = 0;
-	quote = false;
-	save = c;
-	while (*(s + i))
-		count_quote_nested(c, s, &i, &words);
-	return (words);
-}
-
-void	count_length_quote_nested(char const *s, size_t *i, char *c, size_t *j)
-{
-	while (*(s + *i) != *c && *(s + *i))
-	{
-		if (*(s + *i) == '"')
-			*c = '"';
-		else if (*(s + *i) == '\'')
-			*c = '\'';
-		(*i)++;
-		(*j)++;
-	}
-}
-
 size_t	count_length_quote(char const *s, char c, size_t *i)
 {
 	size_t	j;
@@ -138,12 +73,3 @@ char	**ft_split_quote(char const *s, char c)
 	split_arr_quote(split, s, c);
 	return (split);
 }
-
-// int	main(void)
-// {
-// 	char *s = "echo \'$USER | grep nam\' | grep test";
-// 	char **split = ft_split_quote(s, '|');
-// 	printf("=%s =%s =%s\n", split[0], split[1], split[2]);
-// 	char	**split2 = ft_split_quote(split[0], ' ');
-// 	printf("%s =%s\n", split2[0], split2[1]);
-// }

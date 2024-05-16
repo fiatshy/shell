@@ -13,55 +13,6 @@
 #include "parse_test.h"
 #include "libft/libft.h"
 
-void	count_words_first_nested(const char *s, int i, bool *quote)
-{
-	if (*(s + i) == '"' || *(s + i) == '\'')
-	{
-		if (*quote)
-			*quote = false;
-		else
-			*quote = true;
-	}
-}
-
-size_t	count_words_first(char const *s, char c)
-{
-	size_t	i;
-	size_t	words;
-	bool	quote;
-
-	i = 0;
-	words = 0;
-	quote = false;
-	while (*(s + i))
-	{
-		count_words_first_nested(s, i, &quote);
-		if (*(s + i) != c && !quote)
-		{
-			words++;
-			while (*(s + i) != c && *(s + i))
-				i++;
-		}
-		else
-			i++;
-	}
-	return (words);
-}
-
-int	has_delimiter_first(char s)
-{
-	char	*delim;
-
-	delim = "|&";
-	while (*delim)
-	{
-		if (*delim == s)
-			return (1);
-		delim++;
-	}
-	return (0);
-}
-
 int	count_length_first_nested(char const *s, size_t *i, size_t *j, bool *first)
 {
 	bool	delim;
@@ -111,15 +62,6 @@ size_t	count_length_first(char const *s, char c, size_t *i, bool *first)
 	}
 	return (j);
 }
-
-typedef struct s_first
-{
-	size_t	i;
-	size_t	j;
-	size_t	idx;
-	bool	quote;
-	bool	first;
-}				t_first;
 
 void	init_first(t_first *tf)
 {
