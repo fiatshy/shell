@@ -399,6 +399,16 @@ void	make_question_mark(char **s)
 	(*s)[1] = 0;
 }
 
+int	handle_question(char **s)
+{
+	(*s) = ft_strtrim((*s), "$");
+	if ((*s)[0] == '?')
+	{
+		make_question_mark(s);
+		return (1);
+	}
+}
+
 void	handle_noquote_dollar(char **s, t_cmd_struct *tcst)
 {
 	char	**split_env;
@@ -409,12 +419,8 @@ void	handle_noquote_dollar(char **s, t_cmd_struct *tcst)
 	flag = true;
 	prev = NULL;
 	temp = *tcst->lst_env;
-	(*s) = ft_strtrim((*s), "$");
-	if ((*s)[0] == '?')
-	{
-		make_question_mark(s);
+	if (handle_question(s) == 1)
 		return ;
-	}
 	while (temp)
 	{
 		if (ft_strncmp(temp->content, *s, ft_strlen(*s)) == 0)

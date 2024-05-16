@@ -366,6 +366,11 @@ void	ft_cd(t_cmd_struct *tcst, int index)
 	char	buf[255];
 
 	getcwd(buf, 255);
+	if (tcst->tcmd[index]->arg[1] == NULL)
+	{
+		chdir("/home/sunghyki");
+		return ;
+	}
 	if (has_relative_path(tcst->tcmd[index]->arg[1]))
 		chdir(get_relative_path(tcst, index));
 	else
@@ -525,7 +530,10 @@ int	handle_res_nested(int *res, t_cmd_struct *tcst, int index)
 	}
 	else if (*res == 5)
 	{
-		ft_unset(tcst, index);
+		if (tcst->tcmd[index]->arg[1] == NULL)
+			printf("not enough arguments\n");
+		else
+			ft_unset(tcst, index);
 		return (1);
 	}
 	else if (*res == 6)
@@ -1120,10 +1128,15 @@ int	main(void)
 		copy_string_char(&(tcst->s), s, ft_strlen(s));
 		init_tcmd(tcst);
 		tcst->no_of_pipes = get_no_of_pipes(tcst);
-		init_pipe(tcst);
-		prepare_execute(tcst);
-		signal(SIGINT, handle_interrupt);
-		signal(SIGQUIT, SIG_IGN);
+		if (tcst->no_of_pipes <= 5)
+		{
+			init_pipe(tcst);
+			prepare_execute(tcst);
+			signal(SIGINT, handle_interrupt);
+			signal(SIGQUIT, SIG_IGN);
+		}
+		else
+			printf("too many pipes\n");	
 		status = free_all(tcst);
 	}
 
