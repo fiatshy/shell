@@ -435,6 +435,13 @@ void	handle_noquote_dollar(char **s, t_cmd_struct *tcst)
 		make_blank_string(s);
 }
 
+int	has_expr(char *s)
+{
+	if (ft_strncmp("expr", s, 4) == 0)
+		return (1);
+	return (0);
+}
+
 void	set_arguments_nested(t_cmd *tcmd, int i, \
 	t_cmd_struct *tcst, char **split_arg)
 {
@@ -446,7 +453,8 @@ void	set_arguments_nested(t_cmd *tcmd, int i, \
 		else if (have_quote(split_arg[i]) == 0 && \
 			have_dollar_nonzero(split_arg[i]))
 			handle_noquote_dollar(&split_arg[i], tcst);
-		copy_string_char(&tcmd->arg[i], split_arg[i], ft_strlen(split_arg[i]));
+		copy_string_char(tcst, &tcmd->arg[i], \
+			split_arg[i], ft_strlen(split_arg[i]));
 		free(split_arg[i]);
 		i++;
 	}
@@ -576,7 +584,7 @@ void	init_tcmd(t_cmd_struct *tcst)
 	char	*trim_str;
 
 	i = 0;
-	copy_string_char(&temp, tcst->s, ft_strlen(tcst->s));
+	copy_string_char(tcst, &temp, tcst->s, ft_strlen(tcst->s));
 	free(tcst->s);
 	while (i < tcst->n)
 	{
@@ -589,7 +597,7 @@ void	init_tcmd(t_cmd_struct *tcst)
 		if (temp != NULL)
 			free(temp);
 		if (split[1] != NULL)
-			copy_string_char(&temp, split[1], ft_strlen(split[1]));
+			copy_string_char(tcst, &temp, split[1], ft_strlen(split[1]));
 		free_init_tcmd(split, temp, trim_str);
 		i++;
 	}

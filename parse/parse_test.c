@@ -361,11 +361,31 @@ int	has_relative_path(char *s)
 	return (0);
 }
 
+int	has_multi_dots(char *s)
+{
+	int	count;
+
+	count = 0;
+	while (*s)
+	{
+		if (*s == '/')
+			count = 0;
+		else if (*s == '.')
+			count++;
+		s++;
+		if (count > 2)
+			return (-1);
+	}
+	return (0);
+}
+
 void	ft_cd(t_cmd_struct *tcst, int index)
 {
-	char	buf[255];
-
-	getcwd(buf, 255);
+	if (has_multi_dots(tcst->tcmd[index]->arg[1]) == -1)
+	{
+		printf("No such directory\n");
+		return ;
+	}
 	if (tcst->tcmd[index]->arg[1] == NULL)
 	{
 		chdir("/home/sunghyki");
@@ -374,7 +394,10 @@ void	ft_cd(t_cmd_struct *tcst, int index)
 	if (has_relative_path(tcst->tcmd[index]->arg[1]))
 		chdir(get_relative_path(tcst, index));
 	else
-		chdir(tcst->tcmd[index]->arg[1]);
+	{
+		if (chdir(ft_strtrim(tcst->tcmd[index]->arg[1], "\"")) == -1)
+			printf("No such directory\n");
+	}
 }
 
 int	ft_env(t_cmd_struct *tcst)
@@ -753,6 +776,7 @@ void	handle_redirect_delim(t_cmd_struct *tcst, int k)
 void	handle_redirect_output(t_cmd_struct *tcst, int k)
 {
 	struct stat	buf;
+
 	if (ft_strncmp(tcst->trst->split_again[k], ">>", 2) == 0)
 	{
 		tcst->tfd[tcst->tfd_index[2]].append = \
@@ -936,30 +960,39 @@ int	get_args_length(char **s)
 	return (count);
 }
 
-void	handle_redirection_nested(t_cmd_struct *tcst, int j)
+typedef struct s_var
 {
 	int	k;
-	int	index;
 	int	length;
+}				t_var;
+
+int	handle_redirection_nested(t_cmd_struct *tcst, int j)
+{
+	t_var	nested;
+	int		index;
 
 	while (tcst->trst->split_redirection[j])
 	{
 		tcst->trst->split_again = \
 			ft_split(tcst->trst->split_redirection[j], ' ');
-		k = 0;
+		nested.k = 0;
 		index = 0;
-		length = get_args_length(tcst->trst->split_again);
-		tcst->trst->args = malloc (sizeof(char *) * (length + 1));
-		tcst->trst->args[length] = 0;
-		while (tcst->trst->split_again[k])
+		nested.length = get_args_length(tcst->trst->split_again);
+		tcst->trst->args = malloc (sizeof(char *) * (nested.length + 1));
+		tcst->trst->args[nested.length] = 0;
+		if (open(tcst->trst->split_again[1], O_RDONLY) == -1 \
+			&& tcst->trst->split_again[nested.k][0] == '<')
+			return (-1);
+		while (tcst->trst->split_again[nested.k])
 		{
-			handle_again(tcst, k, &index);
-			k++;
+			handle_again(tcst, nested.k, &index);
+			nested.k++;
 		}
-		free_again(tcst, k);
+		free_again(tcst, nested.k);
 		j++;
 	}
 	free_redirection(tcst, j);
+	return (0);
 }
 
 int	check_wrong_redirection(char *s)
@@ -1005,12 +1038,8 @@ int	handle_redirection(t_cmd_struct *tcst, int i)
 		return (-1);
 	j = 0;
 	tcst->trst->args = malloc (sizeof(char *) * 2);
-	handle_redirection_nested(tcst, j);
-	//if (open(tcst->trst->args[1], O_RDONLY) == -1)
-	//{
-	//	printf("No such file\n");
-	//	return (0);
-	//}
+	if (handle_redirection_nested(tcst, j) == -1)
+		return (0);
 	execute_redirection(tcst, first, i);
 	return (0);
 }
@@ -1128,7 +1157,7 @@ int	main(void)
 		add_history(s);
 		init_tcst(&tcst, s, status);
 		tcst->lst_env = lst_env;
-		copy_string_char(&(tcst->s), s, ft_strlen(s));
+		copy_string_char(tcst, &(tcst->s), s, ft_strlen(s));
 		init_tcmd(tcst);
 		tcst->no_of_pipes = get_no_of_pipes(tcst);
 		if (tcst->no_of_pipes <= 5)

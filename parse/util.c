@@ -17,7 +17,7 @@ int	get_closed_index(t_cmd_struct *tcst, int index)
 	while (index < tcst->n)
 	{
 		if (tcst->tcmd[index]->close)
-			return (index); /* sync with i++ in prepare_execute*/
+			return (index);
 		index++;
 	}
 	return (0);
@@ -141,13 +141,18 @@ void	copy_string(t_cmd **tcmd, char *src, int len)
 	(*tcmd)->cmd[len] = 0;
 }
 
-void	copy_string_char(char **s, char *src, int len)
+void	copy_string_char(t_cmd_struct *tcst, char **s, char *src, int len)
 {
 	int		i;
 	char	delim;
+
 	(*s) = malloc (len +1);
 	ft_memcpy((*s), src, len);
 	(*s)[len] = 0;
+	if (src[0] == '?')
+	{
+		(*s)[0] = '0';
+	}
 	i = 0;
 	if ((*s)[0] == '\'' | (*s)[0] == '\"')
 	{
@@ -155,7 +160,6 @@ void	copy_string_char(char **s, char *src, int len)
 		if ((*s)[len - 1] == delim)
 			*s = ft_strtrim(*s, &delim);
 	}
-
 }
 
 int	get_no_of_pipes(t_cmd_struct *tcst)
@@ -171,8 +175,6 @@ int	get_no_of_pipes(t_cmd_struct *tcst)
 		{
 			if (ft_strncmp(tcst->tcmd[i]->next_delimiter, "|", 2) == 0)
 				cnt++;
-			//if (tcst->tcmd[i]->next_delimiter[0] == '|')
-			//	cnt++;
 		}
 		i++;
 	}

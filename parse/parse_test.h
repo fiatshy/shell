@@ -69,7 +69,7 @@ int		has_open_parenthesis(char *s);
 int		has_close_parenthesis(char *s);
 int		get_no_of_command(char *s);
 void	copy_string(t_cmd **tcmd, char *src, int len);
-void	copy_string_char(char **s, char *src, int len);
+void	copy_string_char(t_cmd_struct *tcst, char **s, char *src, int len);
 int		get_no_of_pipes(t_cmd_struct *tcst);
 int		get_no_of_redirection(t_cmd *t);
 int		get_length_of_args(char **split_arg);
