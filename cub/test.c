@@ -9,6 +9,8 @@
 #define	texHeight		64
 #define	mapWidth		24
 #define	mapHeight		24
+#define	miniWidth		120
+#define	miniHeight		120
 #define UP				119
 #define	DOWN			115
 #define LEFT			97
@@ -69,23 +71,31 @@ void	*control_keys(int keycode, t_mlx *tx)
 	double	temp;
 	if (keycode == UP)
 	{
-		tx->pos_arr[0] += tx->dir[0] * 0.1;
-		tx->pos_arr[1] += tx->dir[1] * 0.1;
+		if (tx->map[(int)(tx->pos_arr[0] + tx->dir[0])][(int)tx->pos_arr[1]] == 0) 
+			tx->pos_arr[0] += tx->dir[0] * 0.1;
+		if (tx->map[(int)tx->pos_arr[0]][(int)(tx->pos_arr[1] + tx->dir[1])] == 0) 
+			tx->pos_arr[1] += tx->dir[1] * 0.1;
 	}
 	else if (keycode == DOWN)
 	{
-		tx->pos_arr[0] -= tx->dir[0] * 0.1;
-		tx->pos_arr[1] -= tx->dir[1] * 0.1;
+		if (tx->map[(int)(tx->pos_arr[0] + tx->dir[0])][(int)tx->pos_arr[1]] == 0) 
+			tx->pos_arr[0] -= tx->dir[0] * 0.1;
+		if (tx->map[(int)tx->pos_arr[0]][(int)(tx->pos_arr[1] + tx->dir[1])] == 0) 
+			tx->pos_arr[1] -= tx->dir[1] * 0.1;
 	}
 	else if (keycode == LEFT)
 	{
-		tx->pos_arr[0] -= tx->plane[0] * 0.1;
-		tx->pos_arr[1] -= tx->plane[1] * 0.1;
+		if (tx->map[(int)(tx->pos_arr[0] + tx->plane[0])][(int)tx->pos_arr[1]] == 0) 
+			tx->pos_arr[0] -= tx->plane[0] * 0.1;
+		if (tx->map[(int)tx->pos_arr[0]][(int)(tx->pos_arr[1] + tx->plane[1])] == 0) 
+			tx->pos_arr[1] -= tx->plane[1] * 0.1;
 	}
 	else if (keycode == RIGHT)
 	{
-		tx->pos_arr[0] += tx->plane[0] * 0.1;
-		tx->pos_arr[1] += tx->plane[1] * 0.1;
+		if (tx->map[(int)(tx->pos_arr[0] + tx->plane[0])][(int)tx->pos_arr[1]] == 0) 
+			tx->pos_arr[0] += tx->plane[0] * 0.1;
+		if (tx->map[(int)tx->pos_arr[0]][(int)(tx->pos_arr[1] + tx->plane[1])] == 0) 
+			tx->pos_arr[1] += tx->plane[1] * 0.1;
 	}
 	else if (keycode == RIGHT_ARROW)
 	{
@@ -122,6 +132,51 @@ void	fill_screen(void *data)
 	{
 		j = 0;
 		while (j < screenHeight)
+			put_pixel(tx->img, i, j++, 0x00000000);
+		i++;
+	}
+}
+
+void	fill_obstacle(void	*data)
+{
+	int		i;
+	int		j;
+	t_mlx	*tx;
+
+	i = 0;
+	j = 0;
+	tx = data;
+	int	ratio = miniHeight / mapHeight;
+	while (i < mapHeight)
+	{
+		j = 0;
+		while (j < mapWidth)
+		{
+			if (tx->map[i][j] != 0)
+			{
+				for (int m = i * ratio; m < (i + 1) * ratio; m++)
+				for (int n = j * ratio; n < (j + 1) * ratio; n++)
+					put_pixel(tx->img, m, n, 0x00FFFFFF);
+			}
+			j++;
+		}
+		i++;
+	}
+}
+
+void	fill_minimap(void *data)
+{
+	int	i;
+	int	j;
+	t_mlx	*tx;
+
+	i = 0;
+	j = 0;
+	tx = data;
+	while (i < miniWidth)
+	{
+		j = 0;
+		while (j < miniHeight)
 			put_pixel(tx->img, i, j++, 0x00000000);
 		i++;
 	}
@@ -247,8 +302,11 @@ void	render_frame(void *data)
 		//	put_pixel(tx->img, x, y, color);
 		//}
 	}
+	fill_minimap(tx);
+	fill_obstacle(tx);
+	printf("%f %f\n", tx->pos_arr[0] * 5, tx->pos_arr[1] * 5);
+	put_pixel(tx->img, (int)(tx->pos_arr[0] * 5), (int)(tx->pos_arr[1] * 5), 0x00FF0000);
 	mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->img->img, 0, 0);
-	
 }
 
 int	main(void)
@@ -275,7 +333,7 @@ int	main(void)
 		{4,0,0,0,0,0,0,0,0,0,0,0,6,2,0,0,5,0,0,2,0,0,0,2},
 		{4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
 		{4,0,6,0,6,0,0,0,0,4,6,0,0,0,0,0,5,0,0,0,0,0,0,2},
-		{4,0,0,5,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
+		{4,0,0,5,0,0,0,20,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
 		{4,0,6,0,6,0,0,0,0,4,6,0,6,2,0,0,5,0,0,2,0,0,0,2},
 		{4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
 		{4,4,4,4,4,4,4,4,4,4,1,1,1,2,2,2,2,2,2,3,3,3,3,3}
@@ -285,7 +343,7 @@ int	main(void)
 	t_img	img;
 
 	tx.pos_arr[0] = 22;
-	tx.pos_arr[1] = 12;
+	tx.pos_arr[1] = 11.5;
 
 	tx.dir[0] = -1.0;
 	tx.dir[1] = 0.0;
