@@ -23,7 +23,7 @@ void	set_arguments_nested(t_cmd *tcmd, int i, \
 		else if (have_quote(split_arg[i]) == 0 && \
 			have_dollar_nonzero(split_arg[i]))
 			handle_noquote_dollar(&split_arg[i], tcst);
-		copy_string_char(tcst, &tcmd->arg[i], \
+		copy_string_char(&tcmd->arg[i], \
 			split_arg[i], ft_strlen(split_arg[i]));
 		free(split_arg[i]);
 		i++;

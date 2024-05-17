@@ -85,20 +85,26 @@ typedef struct  s_cmd_struct
 	struct s_pipe		tpipe[10];
 }               t_cmd_struct;
 
+typedef struct s_var
+{
+	int	k;
+	int	length;
+}				t_var;
+
 /* pipe */
-void	set_pipe_head(t_cmd_struct *tcst, int cmd_index);
+void	set_pipe_head(t_cmd_struct *tcst);
 void	set_pipe_body(t_cmd_struct *tcst, int cmd_index);
-void	set_pipe_tail(t_cmd_struct *tcst, int cmd_index);
+void	set_pipe_tail(t_cmd_struct *tcst);
 
 /* ft_split_first */
 void	count_words_first_nested(const char *s, int i, bool *quote);
 size_t	count_words_first(char const *s, char c);
 int		has_delimiter_first(char s);
 int		count_length_first_nested(char const *s, size_t *i, size_t *j, bool *first);
-size_t	count_length_first(char const *s, char c, size_t *i, bool *first);
+size_t	count_length_first(char const *s, size_t *i, bool *first);
 void	init_first(t_first *tf);
-char	**split_arr_first(char **split, char const *s, char c);
-char	**ft_split_first(char const *s, char c);
+char	**split_arr_first(char **split, char const *s);
+char	**ft_split_first(char const *s);
 
 /* ft_split_quote */
 void	count_quote_nest_in_nest(size_t *words, \
@@ -127,7 +133,7 @@ int		space_after_dollar(char *string);
 
 /* arg_dollar_environ */
 void	split_envirion_nested(char *string, int idx, char temp[4][100]);
-void	split_environ(char *string, int s, int e, char temp[4][100]);
+void	split_environ(char *string, char temp[4][100]);
 void	free_env_input(char **split_env_input);
 
 /* arg_dollar_set */
@@ -170,7 +176,7 @@ int		set_arguments(t_cmd *tcmd, t_cmd_struct *tcst);
 void	init_tcst(t_cmd_struct **tcst, char *s, int status);
 void	init_tcmd_set_openclose(t_cmd_struct *tcst, char **split, int i);
 void	init_tcmd(t_cmd_struct *tcst);
-void	free_init_tcmd(char **split, char *temp, char *trim_str);
+void	free_init_tcmd(char **split, char *trim_str);
 
 /*init_fd_pipe*/
 void	init_fds(t_cmd_struct *tcst);
@@ -201,5 +207,105 @@ int		get_length_of_args(char **split_arg);
 
 /* util */
 void	copy_string(t_cmd **tcmd, char *src, int len);
-void	copy_string_char(t_cmd_struct *tcst, char **s, char *src, int len);
+void	copy_string_char(char **s, char *src, int len);
 void	check_redirection(char **s, bool *quote, int *count);
+
+/* handle_signal */
+void	handle_interrupt(int signo);
+void	handle_interrupt_blocked(int signo);
+int		check_if_ctrl_d(char *s);
+
+/* set_tunnel */
+char	*make_bin(t_cmd_struct *tcst);
+void	init_dup2(t_cmd_struct *tcst);
+void	close_fds(t_cmd_struct *tcst);
+void	set_tunnel_redirect(t_cmd_struct *tcst, int index);
+void	set_tunnels(t_cmd_struct *tcst, int index);
+
+/* env */
+char	*get_env(void);
+char	*get_envv(t_cmd_struct *tcst);
+
+/* get_exec_path */
+void	fork_and_exectue_nested(t_cmd_struct *tcst, int index);
+void	get_execute_path_nested(int *response, \
+		char *s, char **cmd_path, t_cmd_struct *tcst);
+char	*get_exectue_path(char *s, t_cmd_struct *tcst);
+
+/* builtin */
+void	ft_echo(t_cmd_struct *tcst, int index);
+void	ft_exit(void);
+void	ft_status(t_cmd_struct *tcst);
+void	ft_pwd(void);
+
+/* relative utils */
+int		find_slash_reverse(char *s, int target);
+void	copy_path(char temp[255], char *src);
+int		has_relative_path(char *s);
+int		has_multi_dots(char *s);
+
+/* relative_path*/
+char	*extract_command(t_cmd_struct *tcst, int index);
+void	delete_redundant_path(char temp[255], int start);
+char	*relative_path_exec_nested(char cwd[255]);
+char	*get_relative_path(t_cmd_struct *tcst, int index);
+char	*get_relative_path_exec(t_cmd_struct *tcst, int index);
+
+/*builtin nested*/
+void	ft_cd(t_cmd_struct *tcst, int index);
+int		ft_env(t_cmd_struct *tcst);
+void	ft_export(t_cmd_struct *tcst, int index);
+void	ft_unset(t_cmd_struct *tcst, int index);
+
+/* builtin utils */
+int		is_builtin(t_cmd_struct *tcst, int index);
+int		exec_builtin(t_cmd_struct *tcst, int index);
+
+/* misc */
+void	trim(t_cmd_struct *tcst, int index, int i);
+char	*what_quotes(char *s);
+void	get_file_length(int *i);
+void	write_env(char **arr, t_cmd_struct *tcst, int index);
+
+/* fork parents */
+int		handle_res_nested(int *res, t_cmd_struct *tcst, int index);
+int		handle_res(int *res, t_cmd_struct *tcst, int index);
+void	handle_parent(t_cmd_struct *tcst, int index);
+
+/* fork */
+void	fork_nested(int res, t_cmd_struct *tcst, int index);
+void	fork_and_exectue_nested(t_cmd_struct *tcst, int index);
+int		fork_and_execute(t_cmd_struct *tcst, int index);
+
+/* grouping */
+int		check_grouping_or(t_cmd_struct *tcst, int *i, int *proceed);
+int		check_grouping_and(t_cmd_struct *tcst, int *i, int *proceed);
+int		check_grouping(t_cmd_struct *tcst, int *i, int *proceed);
+
+/* free */
+int		free_all(t_cmd_struct *tcst);
+void	free_after_exectue(t_cmd_struct *tcst, int i, int *proceed);
+void	free_redirection(t_cmd_struct *tcst, int j);
+void	free_again(t_cmd_struct *tcst, int k);
+int		free_redirect_all(t_cmd_struct *tcst);
+
+/* fork redirect */
+void	set_redirect_args(t_cmd_struct *tcst, int *index, int k);
+void	handle_redirect_delim_nested(t_cmd_struct *tcst);
+void	handle_redirect_delim(t_cmd_struct *tcst, int k);
+void	handle_redirect_output(t_cmd_struct *tcst, int k);
+void	handle_again(t_cmd_struct *tcst, int k, int *index);
+
+/* fork_redirection_nested */
+void	redirect_parents(t_cmd_struct *tcst, int index);
+void	execute_redirection(t_cmd_struct *tcst, int index);
+int		get_args_length(char **s);
+int		handle_redirection_nested(t_cmd_struct *tcst, int j);
+int		handle_redirection(t_cmd_struct *tcst, int i);
+
+/* fork_prepare */
+int		prepare_execute_nested(t_cmd_struct *tcst, int i, int proceed, int cont);
+int		prepare_execute(t_cmd_struct *tcst);
+int		has_only_spaces(char *s);
+int		is_empty_command(char s);
+int		check_wrong_redirection(char *s);

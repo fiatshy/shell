@@ -28,17 +28,15 @@ int	handle_question(char **s)
 		make_question_mark(s);
 		return (1);
 	}
+	return (0);
 }
 
 void	handle_noquote_dollar(char **s, t_cmd_struct *tcst)
 {
-	char	**split_env;
 	t_list	*temp;
-	t_list	*prev;
 	int		flag;
 
 	flag = true;
-	prev = NULL;
 	temp = *tcst->lst_env;
 	if (handle_question(s) == 1)
 		return ;

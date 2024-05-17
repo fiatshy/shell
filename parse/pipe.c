@@ -12,7 +12,7 @@
 
 #include "parse_test.h"
 
-void	set_pipe_head(t_cmd_struct *tcst, int cmd_index)
+void	set_pipe_head(t_cmd_struct *tcst)
 {
 	int	i;
 
@@ -47,7 +47,7 @@ void	set_pipe_body(t_cmd_struct *tcst, int cmd_index)
 	close(tcst->tpipe[cmd_index].fd[1]);
 }
 
-void	set_pipe_tail(t_cmd_struct *tcst, int cmd_index)
+void	set_pipe_tail(t_cmd_struct *tcst)
 {
 	int	i;
 

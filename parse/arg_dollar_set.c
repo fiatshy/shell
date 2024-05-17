@@ -16,7 +16,6 @@ void	handle_dollar_compare(char split_env[4][100], \
 	char **split_arg, int i, char **split_env_input)
 {
 	char	*result_string;
-	char	*remove_quote;
 	int		front_len;
 	int		env_len;
 	int		end_len;
@@ -47,11 +46,9 @@ void	handle_dollar_nested(char split_env[4][100], \
 {
 	char	**split_env_input;
 	t_list	*temp;
-	t_list	*prev;
 	int		flag;
 
 	flag = true;
-	prev = NULL;
 	temp = *tcst->lst_env;
 	while (temp)
 	{
@@ -74,14 +71,11 @@ void	handle_dollar(char **split_arg, int i, t_cmd_struct	*tcst)
 {
 	int		result;
 	int		dollar;
-	int		space;
 	char	split_env[4][100];
-	int		j;
 
 	result = is_double_is_outer(split_arg[i]);
 	dollar = has_dollar(split_arg[i]);
-	space = space_after_dollar(split_arg[i] + dollar);
-	split_environ(split_arg[i], dollar, space, split_env);
+	split_environ(split_arg[i], split_env);
 	if (result && dollar)
 		handle_dollar_nested(split_env, split_arg, i, tcst);
 }

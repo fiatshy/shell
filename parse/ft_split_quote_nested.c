@@ -30,6 +30,7 @@ void	count_quote_nested(char c, char const *s, size_t *i, size_t *words)
 {
 	char	save;
 
+	save = 0;
 	if (c == '"')
 	{
 		c = save;
@@ -52,13 +53,9 @@ size_t	count_words_quote(char const *s, char c)
 {
 	size_t	i;
 	size_t	words;
-	bool	quote;
-	char	save;
 
 	i = 0;
 	words = 0;
-	quote = false;
-	save = c;
 	while (*(s + i))
 		count_quote_nested(c, s, &i, &words);
 	return (words);

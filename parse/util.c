@@ -19,9 +19,8 @@ void	copy_string(t_cmd **tcmd, char *src, int len)
 	(*tcmd)->cmd[len] = 0;
 }
 
-void	copy_string_char(t_cmd_struct *tcst, char **s, char *src, int len)
+void	copy_string_char(char **s, char *src, int len)
 {
-	int		i;
 	char	delim;
 
 	(*s) = malloc (len +1);
@@ -31,8 +30,7 @@ void	copy_string_char(t_cmd_struct *tcst, char **s, char *src, int len)
 	{
 		(*s)[0] = '0';
 	}
-	i = 0;
-	if ((*s)[0] == '\'' | (*s)[0] == '\"')
+	if (((*s)[0] == '\'') || ((*s)[0] == '\"'))
 	{
 		delim = (*s)[0];
 		if ((*s)[len - 1] == delim)

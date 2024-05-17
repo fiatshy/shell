@@ -61,19 +61,17 @@ size_t	count_length_string(char const *s, char *c, size_t *i)
 char	*split_routine(size_t *i, char const *s, size_t *j, char *operand)
 {
 	size_t	k;
-	size_t	l;
 	size_t	cmp_index;
 
 	k = 1;
-	l = 0;
 	cmp_index = 0;
 	k = *i;
 	k--;
 	while (*(s + k) == ' ')
 		k--;
 	cmp_index = k;
-	if (k - 1 >= 0)
-		cmp_index = k - 1;
+	//if (k - 1 >= 0)
+	cmp_index = k - 1;
 	ft_memset(operand, ' ', 3);
 	if (ft_strncmp(s + cmp_index, "<<", 2) == 0)
 		ft_memcpy(operand, "<< ", 3);

@@ -38,13 +38,11 @@ void	split_envirion_nested(char *string, int idx, char temp[4][100])
 	temp[3][0] = 0;
 }
 
-void	split_environ(char *string, int s, int e, char temp[4][100])
+void	split_environ(char *string, char temp[4][100])
 {
 	int		idx;
-	int		cnt;
 
 	idx = 0;
-	cnt = 0;
 	ft_memset(temp[0], 0, 100);
 	while (*(string + idx))
 	{

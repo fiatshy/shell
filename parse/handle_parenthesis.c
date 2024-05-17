@@ -43,6 +43,7 @@ char	*get_first_delimiter(char *s)
 		}
 		s++;
 	}
+	return (NULL);
 }
 
 int	has_delimiter(char *s)

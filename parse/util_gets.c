@@ -6,7 +6,7 @@
 /*   By: sunghyki <sunghyki@student.42gyeongsa      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 18:02:12 by sunghyki          #+#    #+#             */
-/*   Updated: 2024/05/16 18:02:13 by sunghyki         ###   ########.fr       */
+/*   Updated: 2024/05/17 14:36:55 by sunghyki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ int	get_closed_index(t_cmd_struct *tcst, int index)
 int	get_no_of_command(char *s)
 {
 	bool	quote;
-	char	c;
 	int		count;
 
 	quote = false;

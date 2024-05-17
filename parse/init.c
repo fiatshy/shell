@@ -14,7 +14,6 @@
 void	init_tcst(t_cmd_struct **tcst, char *s, int status)
 {
 	int		i;
-	t_fds	*tfd;
 
 	(*tcst) = malloc (sizeof(t_cmd_struct));
 	(*tcst)->n = get_no_of_command(s);
@@ -35,7 +34,7 @@ void	init_tcst(t_cmd_struct **tcst, char *s, int status)
 	init_fds(*tcst);
 }
 
-void	free_init_tcmd(char **split, char *temp, char *trim_str)
+void	free_init_tcmd(char **split, char *trim_str)
 {
 	free(trim_str);
 	free(split[0]);
@@ -62,21 +61,21 @@ void	init_tcmd(t_cmd_struct *tcst)
 	char	*trim_str;
 
 	i = 0;
-	copy_string_char(tcst, &temp, tcst->s, ft_strlen(tcst->s));
+	copy_string_char(&temp, tcst->s, ft_strlen(tcst->s));
 	free(tcst->s);
 	while (i < tcst->n)
 	{
 		tcst->tcmd[i]->next_delimiter = get_first_delimiter(temp);
 		set_pipe_index(tcst, i);
-		split = ft_split_first(temp, ' ');
+		split = ft_split_first(temp);
 		init_tcmd_set_openclose(tcst, split, i);
 		trim_str = ft_strtrim(split[0], " ()");
 		copy_string(&tcst->tcmd[i], trim_str, ft_strlen(trim_str));
 		if (temp != NULL)
 			free(temp);
 		if (split[1] != NULL)
-			copy_string_char(tcst, &temp, split[1], ft_strlen(split[1]));
-		free_init_tcmd(split, temp, trim_str);
+			copy_string_char(&temp, split[1], ft_strlen(split[1]));
+		free_init_tcmd(split, trim_str);
 		i++;
 	}
 }

@@ -39,17 +39,14 @@ int	count_length_first_nested(char const *s, size_t *i, size_t *j, bool *first)
 		(*j)++;
 	}
 	*first = false;
+	return (0);
 }
 
-size_t	count_length_first(char const *s, char c, size_t *i, bool *first)
+size_t	count_length_first(char const *s, size_t *i, bool *first)
 {
 	size_t	j;
-	bool	quote;
-	bool	delim;
 
 	j = 0;
-	quote = false;
-	delim = false;
 	if (*first)
 		count_length_first_nested(s, i, &j, first);
 	else if (!*first)
@@ -71,7 +68,7 @@ void	init_first(t_first *tf)
 	tf->first = true;
 }
 
-char	**split_arr_first(char **split, char const *s, char c)
+char	**split_arr_first(char **split, char const *s)
 {
 	t_first	tf;
 
@@ -84,7 +81,7 @@ char	**split_arr_first(char **split, char const *s, char c)
 			tf.quote = false;
 		if (!has_delimiter_first(*(s + tf.i)) && !tf.quote)
 		{
-			tf.j = count_length_first(s, c, &tf.i, &tf.first);
+			tf.j = count_length_first(s, &tf.i, &tf.first);
 			split[tf.idx] = (char *) malloc (sizeof(char) * (tf.j + 1));
 			if (split[tf.idx] == 0)
 				return (0);
@@ -99,13 +96,13 @@ char	**split_arr_first(char **split, char const *s, char c)
 	return (split);
 }
 
-char	**ft_split_first(char const *s, char c)
+char	**ft_split_first(char const *s)
 {
 	char			**split;
 
 	split = (char **) malloc (sizeof(char *) * (2 + 1));
 	if (split == 0)
 		return (0);
-	split_arr_first(split, s, c);
+	split_arr_first(split, s);
 	return (split);
 }

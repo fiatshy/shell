@@ -39,11 +39,9 @@ char	**split_arr_quote(char **split, char const *s, char c)
 	size_t	i;
 	size_t	j;
 	size_t	idx;
-	bool	quote;
 
 	i = 0;
 	idx = 0;
-	quote = false;
 	while (*(s + i))
 	{
 		if (*(s + i) != c)

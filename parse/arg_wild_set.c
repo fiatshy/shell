@@ -26,7 +26,6 @@ char	**split_args(char *s, int length)
 {
 	DIR				*dp;
 	struct dirent	*entry;
-	char			buf[255];
 	char			**ret;
 	int				i;
 
