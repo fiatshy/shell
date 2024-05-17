@@ -52,7 +52,7 @@ typedef	struct s_mlx
 	double		plane[2];
 	int			(*texture)[8][TEXTURE_HEIGHT * TEXTURE_WIDTH];
 	int			(*map)[MAP_WIDTH];
-	int			*addr;
+	int			*addr;	
 }				t_mlx;
 
 double	abs_double(double x)

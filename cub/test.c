@@ -3,20 +3,24 @@
 #include "libft/libft.h"
 #include "main.h"
 
-#define screenWidth	640
+#define screenWidth		640
 #define screenHeight	480
-#define	texWidth	64
-#define	texHeight	64
-#define	mapWidth	24
-#define	mapHeight	24
-#define UP		119
-#define	DOWN	115
+#define	texWidth		64
+#define	texHeight		64
+#define	mapWidth		24
+#define	mapHeight		24
+#define UP				119
+#define	DOWN			115
+#define LEFT			97
+#define	RIGHT			100
+#define LEFT_ARROW		65361
+#define	RIGHT_ARROW		65363
 
-#define RGB_Red 	0x00FF0000
-#define RGB_Green 	0x0000FF00
-#define RGB_Blue	0x000000FF
-#define RGB_White	0x00FFFFFF
-#define	RGB_Yellow	0x00FFFF00
+#define RGB_Red 		0x00FF0000
+#define RGB_Green 		0x0000FF00
+#define RGB_Blue		0x000000FF
+#define RGB_White		0x00FFFFFF
+#define	RGB_Yellow		0x00FFFF00
 
 typedef struct s_img
 {
@@ -39,6 +43,10 @@ typedef	struct s_mlx
 	int			(*texture)[8][texHeight * texWidth];
 	int			(*map)[mapWidth];
 	int			*addr;
+	int			*eddr;
+	int			*wddr;
+	int			*nddr;
+	int			*sddr;
 }				t_mlx;
 
 void	put_pixel(t_img *img, int x, int y, int color)
@@ -68,6 +76,36 @@ void	*control_keys(int keycode, t_mlx *tx)
 	{
 		tx->pos_arr[0] -= tx->dir[0] * 0.1;
 		tx->pos_arr[1] -= tx->dir[1] * 0.1;
+	}
+	else if (keycode == LEFT)
+	{
+		tx->pos_arr[0] -= tx->plane[0] * 0.1;
+		tx->pos_arr[1] -= tx->plane[1] * 0.1;
+	}
+	else if (keycode == RIGHT)
+	{
+		tx->pos_arr[0] += tx->plane[0] * 0.1;
+		tx->pos_arr[1] += tx->plane[1] * 0.1;
+	}
+	else if (keycode == RIGHT_ARROW)
+	{
+		double	oldDirX = tx->dir[0];
+		double	rotSpeed = 0.25;
+		tx->dir[0] = tx->dir[0] * cos(-rotSpeed) - tx->dir[1] * sin(-rotSpeed);
+      	tx->dir[1] = oldDirX * sin(-rotSpeed) + tx->dir[1] * cos(-rotSpeed);
+		double oldPlaneX = tx->plane[0];
+		tx->plane[0] = tx->plane[0] * cos(-rotSpeed) - tx->plane[1] * sin(-rotSpeed);
+		tx->plane[1] = oldPlaneX * sin(-rotSpeed) + tx->plane[1] * cos(-rotSpeed);
+	}
+	else if (keycode == LEFT_ARROW)
+	{
+		double	rotSpeed = 0.25;
+		double	oldDirX = tx->dir[0];
+		tx->dir[0] = tx->dir[0] * cos(rotSpeed) - tx->dir[1] * sin(rotSpeed);
+		tx->dir[1] = oldDirX * sin(rotSpeed) + tx->dir[1] * cos(rotSpeed);
+		double oldPlaneX = tx->plane[0];
+		tx->plane[0] = tx->plane[0] * cos(rotSpeed) - tx->plane[1] * sin(rotSpeed);
+		tx->plane[1] = oldPlaneX * sin(rotSpeed) + tx->plane[1] * cos(rotSpeed);
 	}
 }
 
@@ -180,11 +218,17 @@ void	render_frame(void *data)
 		double texPos = (drawStart - pitch - h / 2 + lineHeight / 2) * step;
 		for(int y = drawStart; y < drawEnd; y++)
 		{
-			// Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
 			int texY = (int)texPos & (texHeight - 1);
 			texPos += step;
-			int color = tx->addr[texHeight * texY + texX];
-			//make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
+			int	color;
+			if (rayDirX < 0 && side == 0)
+				color = tx->eddr[texHeight * texY + texX];
+			else if (rayDirX > 0 && side == 0)
+				color = tx->wddr[texHeight * texY + texX];
+			else if (rayDirY < 0 && side == 1)
+				color = tx->nddr[texHeight * texY + texX];
+			else if (rayDirY > 0 && side == 1)
+				color = tx->sddr[texHeight * texY + texX];
 			if(side == 1) color = (color >> 1) & 8355711;
 			put_pixel(tx->img, x, y, color);
 		}
@@ -263,6 +307,14 @@ int	main(void)
 	int	xpm_height;
 	void	*img_ptr = mlx_xpm_file_to_image(tx.mlx, "mossy.xpm", &xpm_width, &xpm_height);
 	tx.addr = (int *)mlx_get_data_addr(img_ptr, &temp_img.bits_per_pixel, &temp_img.line_length, &temp_img.endian);
+	void	*img_ptr_e = mlx_xpm_file_to_image(tx.mlx, "east.xpm", &xpm_width, &xpm_height);
+	tx.eddr = (int *)mlx_get_data_addr(img_ptr_e, &temp_img.bits_per_pixel, &temp_img.line_length, &temp_img.endian);
+	void	*img_ptr_w = mlx_xpm_file_to_image(tx.mlx, "west.xpm", &xpm_width, &xpm_height);
+	tx.wddr = (int *)mlx_get_data_addr(img_ptr_w, &temp_img.bits_per_pixel, &temp_img.line_length, &temp_img.endian);
+	void	*img_ptr_n = mlx_xpm_file_to_image(tx.mlx, "north.xpm", &xpm_width, &xpm_height);
+	tx.nddr = (int *)mlx_get_data_addr(img_ptr_n, &temp_img.bits_per_pixel, &temp_img.line_length, &temp_img.endian);
+	void	*img_ptr_s = mlx_xpm_file_to_image(tx.mlx, "south.xpm", &xpm_width, &xpm_height);
+	tx.sddr = (int *)mlx_get_data_addr(img_ptr_s, &temp_img.bits_per_pixel, &temp_img.line_length, &temp_img.endian);
 	mlx_hook(tx.mlx_win, 2, 1L << 0, control_keys, (void *)&tx);
 	//mlx_hook(tx.mlx_win, 6, 1L << 6, control_mouse, (void *)&tx);
 	mlx_loop_hook(tx.mlx, render_frame, (void *)&tx);
