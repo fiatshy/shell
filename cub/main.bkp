@@ -21,8 +21,8 @@
 #define	MAP_HEIGHT	5
 #define	SPEED	3
 #define	ROTATE_AMT	25
-#define	TEXTURE_WIDTH 64
-#define	TEXTURE_HEIGHT 64
+#define	TEXTURE_WIDTH 20
+#define	TEXTURE_HEIGHT 20
 
 typedef struct s_texture
 {
@@ -121,13 +121,13 @@ int	draw_line(t_mlx *tx, int begin_x, int begin_y, int end_x, int end_y, int col
 
 void	*control_key_release(int keycode, t_mlx *tx)
 {
-	//printf("%d\n", keycode);
+	printf("%d\n", keycode);
 }
 
 void	*control_keys(int keycode, t_mlx *tx)
 {
 	double	temp;
-	//printf("%d\n", keycode);
+	printf("%d\n", keycode);
 	if (keycode == UP)
 	{
 		if (tx->pos[1] - SPEED >= 0)
@@ -138,7 +138,6 @@ void	*control_keys(int keycode, t_mlx *tx)
 			tx->pos[1] -= tx->dir[1] * 5;
 			tx->pos_arr[0] += tx->dir[0] * 0.05;
 			tx->pos_arr[1] -= tx->dir[1] * 0.05;
-			printf("%f %f\n", tx->pos_arr[0], tx->pos_arr[1]);
 			//printf(" UP %f %f %f %f\n", tx->pos[0], tx->pos[1], tx->pos_arr[0], tx->pos_arr[1]);
 			//put_pixel(tx->img, tx->pos[0], tx->pos[1], RED_DOT);
 			//mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->img->img, 0, 0);
@@ -369,61 +368,36 @@ void	render_frame(void *data)
 		}
 
 		double	final_length;
-		double	wallX;
 		if (side == 0)
 		{
 			final_length = distX - deltaX;
-			wallX = tx->pos_arr[1] + final_length * rayY;
 		}
-		else
+		else if (side == 1)
 		{
 			final_length = distY - deltaY;
-			wallX = tx->pos_arr[0] + final_length * rayX;
 		}
-		/* fix */
-		wallX -= (int)wallX;
-		int	texX = (int)(wallX * (double)TEXTURE_WIDTH);
-		if (side == 0 && rayX > 0) texX = TEXTURE_WIDTH - texX - 1;
-		if (side == 1 && rayY < 0) texX = TEXTURE_WIDTH - texX - 1;
-		int	lineheight = (int)(HEIGHT / final_length);
-		int	drawStart = (-1 * lineheight) / 2 + HEIGHT / 2;
-		if (drawStart < 0) drawStart = 0;
-		int	drawEnd = lineheight / 2 + HEIGHT / 2;
-		if (drawEnd >= HEIGHT) drawEnd = HEIGHT - 1;
-		double step = 1.0 * TEXTURE_HEIGHT / lineheight;
-		double texPos = (drawStart - HEIGHT / 2 + lineheight / 2) * step;
-		for (int y=drawStart; y < drawEnd; y++)
-		{
-			int texY = (int)texPos & (TEXTURE_HEIGHT - 1);
-			texPos += step;
-			//printf("%d %f\n", texX, texY);
-			int	color = tx->addr[TEXTURE_HEIGHT * texY + texX];
-			put_pixel(tx->img, x, y, color);
-		}
-		//printf("==%f %d %d %d %d\n", wallX, texX, drawStart, drawEnd, lineheight);
-		//printf("%f\n", final_length);
-		//float	draw_length = 1 / final_length * HEIGHT;
+		float	draw_length = 1 / final_length * HEIGHT;
 		// printf("%d %d %d %f %f\n", mapY, mapX, side, final_length, draw_length);
-		//draw_wall(tx, x, draw_length);
+		draw_wall(tx, x, draw_length);
 		x += 1;
 	}
 	fill_minimap(tx);
 	fill_minimap_init(tx);
 	put_pixel(tx->img, tx->pos[0], tx->pos[1], 0x00FF0000);
-	//int	idx = 0;
-	//for (int j = 0; j < 64; j++)
-	//{
-	//	for (int i = 0; i < 64; i++)
-	//	{elta
-	//		put_pixel(tx->img, i * 2 , j * 2  , tx->addr[(int)(64 * j + i)]);
-	//		put_pixel(tx->img, i * 2 , j * 2 + 1, tx->addr[(int)(64 * j + i)]);
-	//		put_pixel(tx->img, i * 2 + 1, j * 2, tx->addr[(int)(64 * j + i)]);
-	//		put_pixel(tx->img, i * 2 + 1, j * 2 + 1, tx->addr[(int)(64 * j + i)]);
-	//	}
-	//}
+	int	idx = 0;
+	for (int j = 0; j < 64; j++)
+	{
+		for (int i = 0; i < 64; i++)
+		{
+			put_pixel(tx->img, i * 2 , j * 2  , tx->addr[(int)(64 * j + i)]);
+			put_pixel(tx->img, i * 2 , j * 2 + 1, tx->addr[(int)(64 * j + i)]);
+			put_pixel(tx->img, i * 2 + 1, j * 2, tx->addr[(int)(64 * j + i)]);
+			put_pixel(tx->img, i * 2 + 1, j * 2 + 1, tx->addr[(int)(64 * j + i)]);
+		}
+	}
 	
-	draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
-	draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
+	//draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10) + (tx->plane[0] * 10), tx->pos[1] - (tx->dir[1] * 10) - (tx->plane[1] * 10), 0x00FF0000);
+	//draw_line(tx, tx->pos[0], tx->pos[1], tx->pos[0] + (tx->dir[0] * 10), tx->pos[1] - (tx->dir[1] * 10), 0x00FF0000);
 	mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->img->img, 0, 0);
 	//mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->temp_img, 0, 0);
 }
@@ -476,8 +450,8 @@ int	main(void)
 
 	tx.texture = &texture;
 
-	tx.pos[0] = 40;
-	tx.pos[1] = 80;
+	tx.pos[0] = 50;
+	tx.pos[1] = 75;
 
 	tx.pos_arr[0] = 2.5;
 	tx.pos_arr[1] = 4;
@@ -506,7 +480,7 @@ int	main(void)
 	t_img	temp_img;
 	int	xpm_width;
 	int	xpm_height;
-	void	*img_ptr = mlx_xpm_file_to_image(tx.mlx, "east.xpm", &xpm_width, &xpm_height);
+	void	*img_ptr = mlx_xpm_file_to_image(tx.mlx, "mossy.xpm", &xpm_width, &xpm_height);
 	tx.addr = (int *)mlx_get_data_addr(img_ptr, &temp_img.bits_per_pixel, &temp_img.line_length, &temp_img.endian);
 	mlx_hook(tx.mlx_win, 2, 1L << 0, control_keys, (void *)&tx);
 	mlx_hook(tx.mlx_win, 6, 1L << 6, control_mouse, (void *)&tx);
