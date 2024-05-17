@@ -24,6 +24,8 @@
 #define RGB_White		0x00FFFFFF
 #define	RGB_Yellow		0x00FFFF00
 
+#define numSprites 		8
+
 typedef struct s_img
 {
 	void	*img;
@@ -32,6 +34,52 @@ typedef struct s_img
 	int		line_length;
 	int		endian;
 }				t_img;
+
+typedef struct s_prite
+{
+	double 	x;
+	double 	y;
+	int 	texture;
+}		t_prite;
+
+struct Pair {
+    double first;
+    int second;
+};
+
+void sortSprites(int* order, double* dist, int amount) {
+    struct Pair* sprites = (struct Pair*)malloc(amount * sizeof(struct Pair));
+    if (sprites == NULL) {
+        // Handle memory allocation failure
+        return;
+    }
+    
+    // Populate sprites array
+    for(int i = 0; i < amount; i++) {
+        sprites[i].first = dist[i];
+        sprites[i].second = order[i];
+    }
+    
+    // Sort sprites array based on the first element (distance)
+    for(int i = 0; i < amount - 1; i++) {
+        for(int j = 0; j < amount - i - 1; j++) {
+            if(sprites[j].first > sprites[j+1].first) {
+                // Swap elements
+                struct Pair temp = sprites[j];
+                sprites[j] = sprites[j+1];
+                sprites[j+1] = temp;
+            }
+        }
+    }
+
+    // Restore in reverse order to go from farthest to nearest
+    for(int i = 0; i < amount; i++) {
+        dist[i] = sprites[amount - i - 1].first;
+        order[i] = sprites[amount - i - 1].second;
+    }
+    
+    free(sprites); // Free dynamically allocated memory
+}
 
 typedef	struct s_mlx
 {
@@ -42,6 +90,10 @@ typedef	struct s_mlx
 	double		pos_arr[2];
 	double		dir[2];
 	double		plane[2];
+	double		ZBuffer[screenWidth];
+	t_prite		*sprite;
+	int			spriteOrder[numSprites];
+	double		spriteDistance[numSprites];
 	int			(*texture)[8][texHeight * texWidth];
 	int			(*map)[mapWidth];
 	int			*addr;
@@ -49,6 +101,7 @@ typedef	struct s_mlx
 	int			*wddr;
 	int			*nddr;
 	int			*sddr;
+	int			*light;
 }				t_mlx;
 
 void	put_pixel(t_img *img, int x, int y, int color)
@@ -306,21 +359,69 @@ void	render_frame(void *data)
 			if(side == 1) color = (color >> 1) & 8355711;
 			put_pixel(tx->img, x, y, color);
 		}
-		//int	color;
-		//switch(tx->map[mapX][mapY])
-		//{
-		//	case 1:  color = RGB_Red;    break; //red
-		//	case 2:  color = RGB_Green;  break; //green
-		//	case 3:  color = RGB_Blue;   break; //blue
-		//	case 4:  color = RGB_White;  break; //white
-		//	default: color = RGB_Yellow; break; //yellow
-		//}
-		//if (side == 1) { color = color / 2; }
-		//for (int y=drawStart; y < drawEnd; y++)
-		//{
-		//	put_pixel(tx->img, x, y, color);
-		//}
+		tx->ZBuffer[x] = perpWallDist;
 	}
+
+	for (int i=0; i < numSprites; i++)
+	{
+		tx->spriteOrder[i] = i;
+		tx->spriteDistance[i] = ((tx->pos_arr[0] - tx->sprite[i].x) * (tx->pos_arr[0] - tx->sprite[i].x) + (tx->pos_arr[1] - tx->sprite[i].y) * (tx->pos_arr[1] - tx->sprite[i].y));
+	}
+
+	sortSprites(tx->spriteOrder, tx->spriteDistance, numSprites);
+
+	for (int i = 0; i < numSprites; i++)
+	{
+		double	spriteX = tx->sprite[tx->spriteOrder[i]].x - tx->pos_arr[0];
+		double	spriteY = tx->sprite[tx->spriteOrder[i]].y - tx->pos_arr[1];
+		double	invDet = 1.0 / (tx->plane[0] * tx->dir[1] - tx->dir[0] * tx->plane[1]);
+		double	transformX = invDet * (tx->dir[1] * spriteX - tx->dir[0] * spriteY);
+		double 	transformY = invDet * (-tx->plane[1] * spriteX + tx->plane[0] * spriteY);
+
+		int spriteScreenX = (int)((w / 2) * (1 + transformX / transformY));
+		//parameters for scaling and moving the sprites
+      #define uDiv 1
+      #define vDiv 1
+      #define vMove 0.0
+      int vMoveScreen = (int)(vMove / transformY);
+
+      //calculate height of the sprite on screen
+	  int	h = screenHeight;
+      int spriteHeight = abs((int)(h / (transformY))) / vDiv; //using "transformY" instead of the real distance prevents fisheye
+      //calculate lowest and highest pixel to fill in current stripe
+      int drawStartY = -spriteHeight / 2 + h / 2 + vMoveScreen;
+      if(drawStartY < 0) drawStartY = 0;
+      int drawEndY = spriteHeight / 2 + h / 2 + vMoveScreen;
+      if(drawEndY >= h) drawEndY = h - 1;
+
+      //calculate width of the sprite
+      int spriteWidth = abs((int) (h / (transformY))) / uDiv; // same as height of sprite, given that it's square
+      int drawStartX = -spriteWidth / 2 + spriteScreenX;
+      if(drawStartX < 0) drawStartX = 0;
+      int drawEndX = spriteWidth / 2 + spriteScreenX;
+      if(drawEndX > w) drawEndX = w;
+
+      //loop through every vertical stripe of the sprite on screen
+      for(int stripe = drawStartX; stripe < drawEndX; stripe++)
+      {
+        int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
+        //the conditions in the if are:
+        //1) it's in front of camera plane so you don't see things behind you
+        //2) ZBuffer, with perpendicular distance
+        if(transformY > 0 && transformY < tx->ZBuffer[stripe])
+        {
+          for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+          {
+            int d = (y - vMoveScreen) * 256 - h * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
+            int texY = ((d * texHeight) / spriteHeight) / 256;
+            int color = tx->light[texWidth * texY + texX]; //get current color from the texture
+            if((color & 0x00FFFFFF) != 0) put_pixel(tx->img, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
+          }
+        }
+      }
+
+	}
+
 	fill_minimap(tx);
 	fill_obstacle(tx);
 	//printf("%f %f\n", tx->pos_arr[0] * 5, tx->pos_arr[1] * 5);
@@ -361,6 +462,20 @@ int	main(void)
 	t_mlx	tx;
 	t_img	img;
 
+	t_prite sprite[numSprites] =
+	{
+		{20.5, 11.5, 10},
+		{18.5,4.5, 10},
+		{10.0,4.5, 10},
+		{10.0,12.5,10},
+		{3.5, 6.5, 10},
+		{3.5, 20.5,10},
+		{3.5, 14.5,10},
+		{14.5,20.5,10}
+	};
+
+	tx.sprite = sprite;
+
 	tx.pos_arr[0] = 22;
 	tx.pos_arr[1] = 11.5;
 
@@ -392,6 +507,8 @@ int	main(void)
 	tx.nddr = (int *)mlx_get_data_addr(img_ptr_n, &temp_img.bits_per_pixel, &temp_img.line_length, &temp_img.endian);
 	void	*img_ptr_s = mlx_xpm_file_to_image(tx.mlx, "south.xpm", &xpm_width, &xpm_height);
 	tx.sddr = (int *)mlx_get_data_addr(img_ptr_s, &temp_img.bits_per_pixel, &temp_img.line_length, &temp_img.endian);
+	void	*img_ptr_l = mlx_xpm_file_to_image(tx.mlx, "greenlight.xpm", &xpm_width, &xpm_height);
+	tx.light = (int *)mlx_get_data_addr(img_ptr_l, &temp_img.bits_per_pixel, &temp_img.line_length, &temp_img.endian);
 	mlx_hook(tx.mlx_win, 2, 1L << 0, control_keys, (void *)&tx);
 	//mlx_hook(tx.mlx_win, 6, 1L << 6, control_mouse, (void *)&tx);
 	mlx_loop_hook(tx.mlx, render_frame, (void *)&tx);
