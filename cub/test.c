@@ -132,7 +132,7 @@ void	fill_screen(void *data)
 	{
 		j = 0;
 		while (j < screenHeight)
-			put_pixel(tx->img, i, j++, 0x00000000);
+			put_pixel(tx->img, i, j++, 0x004b3a26);
 		i++;
 	}
 }
@@ -182,12 +182,31 @@ void	fill_minimap(void *data)
 	}
 }
 
+void fill_ceiling(void *data)
+{
+	int	i;
+	int	j;
+	t_mlx	*tx;
+
+	i = 0;
+	j = 0;
+	tx = data;
+	while (i < screenWidth)
+	{
+		j = 0;
+		while (j < screenHeight / 2)
+			put_pixel(tx->img, i, j++, 0x0087ceeb);
+		i++;
+	}
+}
+
 void	render_frame(void *data)
 {
 	t_mlx	*tx = data;
 	int	w = screenWidth;
 
 	fill_screen(tx);
+	fill_ceiling(tx);
 	for (int x = 0; x < w; x++)
 	{
 		double	cameraX = 2 * x / (double)w - 1;
@@ -304,7 +323,7 @@ void	render_frame(void *data)
 	}
 	fill_minimap(tx);
 	fill_obstacle(tx);
-	printf("%f %f\n", tx->pos_arr[0] * 5, tx->pos_arr[1] * 5);
+	//printf("%f %f\n", tx->pos_arr[0] * 5, tx->pos_arr[1] * 5);
 	put_pixel(tx->img, (int)(tx->pos_arr[0] * 5), (int)(tx->pos_arr[1] * 5), 0x00FF0000);
 	mlx_put_image_to_window(tx->mlx, tx->mlx_win, tx->img->img, 0, 0);
 }
