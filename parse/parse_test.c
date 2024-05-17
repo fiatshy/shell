@@ -35,7 +35,7 @@ int	main(void)
 		add_history(s);
 		init_tcst(&tcst, s, status);
 		tcst->lst_env = lst_env;
-		copy_string_char(&(tcst->s), s, ft_strlen(s));
+		copy_string_char(tcst, &(tcst->s), s, ft_strlen(s));
 		init_tcmd(tcst);
 		tcst->no_of_pipes = get_no_of_pipes(tcst);
 		if (tcst->no_of_pipes <= 5)

@@ -207,7 +207,7 @@ int		get_length_of_args(char **split_arg);
 
 /* util */
 void	copy_string(t_cmd **tcmd, char *src, int len);
-void	copy_string_char(char **s, char *src, int len);
+void	copy_string_char(t_cmd_struct *tcst, char **s, char *src, int len);
 void	check_redirection(char **s, bool *quote, int *count);
 
 /* handle_signal */

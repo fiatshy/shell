@@ -19,17 +19,15 @@ void	copy_string(t_cmd **tcmd, char *src, int len)
 	(*tcmd)->cmd[len] = 0;
 }
 
-void	copy_string_char(char **s, char *src, int len)
+void	copy_string_char(t_cmd_struct *tcst, char **s, char *src, int len)
 {
 	char	delim;
 
 	(*s) = malloc (len +1);
 	ft_memcpy((*s), src, len);
 	(*s)[len] = 0;
-	if (src[0] == '?')
-	{
-		(*s)[0] = '0';
-	}
+	if (src[0] == '?' && ft_strncmp("expr", tcst->tcmd[0]->arg[0], 4) == 0)
+		(*s)[0] = tcst->status + '0';
 	if (((*s)[0] == '\'') || ((*s)[0] == '\"'))
 	{
 		delim = (*s)[0];

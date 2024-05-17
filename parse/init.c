@@ -61,7 +61,7 @@ void	init_tcmd(t_cmd_struct *tcst)
 	char	*trim_str;
 
 	i = 0;
-	copy_string_char(&temp, tcst->s, ft_strlen(tcst->s));
+	copy_string_char(tcst, &temp, tcst->s, ft_strlen(tcst->s));
 	free(tcst->s);
 	while (i < tcst->n)
 	{
@@ -74,7 +74,7 @@ void	init_tcmd(t_cmd_struct *tcst)
 		if (temp != NULL)
 			free(temp);
 		if (split[1] != NULL)
-			copy_string_char(&temp, split[1], ft_strlen(split[1]));
+			copy_string_char(tcst, &temp, split[1], ft_strlen(split[1]));
 		free_init_tcmd(split, trim_str);
 		i++;
 	}
