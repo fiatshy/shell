@@ -7,8 +7,8 @@
 #define screenHeight	480
 #define	texWidth		64
 #define	texHeight		64
-#define	mapWidth		24
-#define	mapHeight		24
+#define	mapWidth		8
+#define	mapHeight		8
 #define	miniWidth		120
 #define	miniHeight		120
 #define UP				119
@@ -358,69 +358,70 @@ void	render_frame(void *data)
 				color = tx->sddr[texHeight * texY + texX];
 			if(side == 1) color = (color >> 1) & 8355711;
 			put_pixel(tx->img, x, y, color);
+
 		}
 		tx->ZBuffer[x] = perpWallDist;
 	}
 
-	for (int i=0; i < numSprites; i++)
-	{
-		tx->spriteOrder[i] = i;
-		tx->spriteDistance[i] = ((tx->pos_arr[0] - tx->sprite[i].x) * (tx->pos_arr[0] - tx->sprite[i].x) + (tx->pos_arr[1] - tx->sprite[i].y) * (tx->pos_arr[1] - tx->sprite[i].y));
-	}
+	// for (int i=0; i < numSprites; i++)
+	// {
+	// 	tx->spriteOrder[i] = i;
+	// 	tx->spriteDistance[i] = ((tx->pos_arr[0] - tx->sprite[i].x) * (tx->pos_arr[0] - tx->sprite[i].x) + (tx->pos_arr[1] - tx->sprite[i].y) * (tx->pos_arr[1] - tx->sprite[i].y));
+	// }
 
-	sortSprites(tx->spriteOrder, tx->spriteDistance, numSprites);
+	// sortSprites(tx->spriteOrder, tx->spriteDistance, numSprites);
 
-	for (int i = 0; i < numSprites; i++)
-	{
-		double	spriteX = tx->sprite[tx->spriteOrder[i]].x - tx->pos_arr[0];
-		double	spriteY = tx->sprite[tx->spriteOrder[i]].y - tx->pos_arr[1];
-		double	invDet = 1.0 / (tx->plane[0] * tx->dir[1] - tx->dir[0] * tx->plane[1]);
-		double	transformX = invDet * (tx->dir[1] * spriteX - tx->dir[0] * spriteY);
-		double 	transformY = invDet * (-tx->plane[1] * spriteX + tx->plane[0] * spriteY);
+	// for (int i = 0; i < numSprites; i++)
+	// {
+	// 	double	spriteX = tx->sprite[tx->spriteOrder[i]].x - tx->pos_arr[0];
+	// 	double	spriteY = tx->sprite[tx->spriteOrder[i]].y - tx->pos_arr[1];
+	// 	double	invDet = 1.0 / (tx->plane[0] * tx->dir[1] - tx->dir[0] * tx->plane[1]);
+	// 	double	transformX = invDet * (tx->dir[1] * spriteX - tx->dir[0] * spriteY);
+	// 	double 	transformY = invDet * (-tx->plane[1] * spriteX + tx->plane[0] * spriteY);
 
-		int spriteScreenX = (int)((w / 2) * (1 + transformX / transformY));
-		//parameters for scaling and moving the sprites
-      #define uDiv 1
-      #define vDiv 1
-      #define vMove 0.0
-      int vMoveScreen = (int)(vMove / transformY);
+	// 	int spriteScreenX = (int)((w / 2) * (1 + transformX / transformY));
+	// 	//parameters for scaling and moving the sprites
+	// 	#define uDiv 1
+	// 	#define vDiv 1
+	// 	#define vMove 0.0
+	// 	int vMoveScreen = (int)(vMove / transformY);
 
-      //calculate height of the sprite on screen
-	  int	h = screenHeight;
-      int spriteHeight = abs((int)(h / (transformY))) / vDiv; //using "transformY" instead of the real distance prevents fisheye
-      //calculate lowest and highest pixel to fill in current stripe
-      int drawStartY = -spriteHeight / 2 + h / 2 + vMoveScreen;
-      if(drawStartY < 0) drawStartY = 0;
-      int drawEndY = spriteHeight / 2 + h / 2 + vMoveScreen;
-      if(drawEndY >= h) drawEndY = h - 1;
+	// 	//calculate height of the sprite on screen
+	// 	int	h = screenHeight;
+	// 	int spriteHeight = abs((int)(h / (transformY))) / vDiv; //using "transformY" instead of the real distance prevents fisheye
+	// 	//calculate lowest and highest pixel to fill in current stripe
+	// 	int drawStartY = -spriteHeight / 2 + h / 2 + vMoveScreen;
+	// 	if(drawStartY < 0) drawStartY = 0;
+	// 	int drawEndY = spriteHeight / 2 + h / 2 + vMoveScreen;
+	// 	if(drawEndY >= h) drawEndY = h - 1;
 
-      //calculate width of the sprite
-      int spriteWidth = abs((int) (h / (transformY))) / uDiv; // same as height of sprite, given that it's square
-      int drawStartX = -spriteWidth / 2 + spriteScreenX;
-      if(drawStartX < 0) drawStartX = 0;
-      int drawEndX = spriteWidth / 2 + spriteScreenX;
-      if(drawEndX > w) drawEndX = w;
+	// 	//calculate width of the sprite
+	// 	int spriteWidth = abs((int) (h / (transformY))) / uDiv; // same as height of sprite, given that it's square
+	// 	int drawStartX = -spriteWidth / 2 + spriteScreenX;
+	// 	if(drawStartX < 0) drawStartX = 0;
+	// 	int drawEndX = spriteWidth / 2 + spriteScreenX;
+	// 	if(drawEndX > w) drawEndX = w;
 
-      //loop through every vertical stripe of the sprite on screen
-      for(int stripe = drawStartX; stripe < drawEndX; stripe++)
-      {
-        int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
-        //the conditions in the if are:
-        //1) it's in front of camera plane so you don't see things behind you
-        //2) ZBuffer, with perpendicular distance
-        if(transformY > 0 && transformY < tx->ZBuffer[stripe])
-        {
-          for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
-          {
-            int d = (y - vMoveScreen) * 256 - h * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
-            int texY = ((d * texHeight) / spriteHeight) / 256;
-            int color = tx->light[texWidth * texY + texX]; //get current color from the texture
-            if((color & 0x00FFFFFF) != 0) put_pixel(tx->img, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
-          }
-        }
-      }
+	// 	//loop through every vertical stripe of the sprite on screen
+	// 	for(int stripe = drawStartX; stripe < drawEndX; stripe++)
+	// 	{
+	// 		int texX = (int)((stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth);
+	// 		//the conditions in the if are:
+	// 		//1) it's in front of camera plane so you don't see things behind you
+	// 		//2) ZBuffer, with perpendicular distance
+	// 		if(transformY > 0 && transformY < tx->ZBuffer[stripe])
+	// 		{
+	// 			for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+	// 			{
+	// 				int d = (y - vMoveScreen) - h * 1/2 + spriteHeight * 1/2; //256 and 128 factors to avoid floats
+	// 				int texY = ((d * texHeight) / spriteHeight);
+	// 				int color = tx->light[texWidth * texY + texX]; //get current color from the texture
+	// 				if((color & 0x00FFFFFF) != 0) put_pixel(tx->img, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
+	// 			}
+	// 		}
+	// 	}
 
-	}
+	// }
 
 	fill_minimap(tx);
 	fill_obstacle(tx);
@@ -431,32 +432,44 @@ void	render_frame(void *data)
 
 int	main(void)
 {
+	// int worldMap[mapWidth][mapHeight]=
+	// {
+	// 	{4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,7,7,7,7,7,7,7,7},
+	// 	{4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
+	// 	{4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
+	// 	{4,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
+	// 	{4,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
+	// 	{4,0,4,0,0,0,0,5,5,5,5,5,5,5,5,5,7,7,0,7,7,7,7,7},
+	// 	{4,0,5,0,0,0,0,5,0,5,0,5,0,5,0,5,7,0,0,0,7,7,7,1},
+	// 	{4,0,6,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
+	// 	{4,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,7,1},
+	// 	{4,0,8,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
+	// 	{4,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,7,7,7,1},
+	// 	{4,0,0,0,0,0,0,5,5,5,5,0,5,5,5,5,7,7,7,7,7,7,7,1},
+	// 	{6,6,6,6,6,6,6,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
+	// 	{8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+	// 	{6,6,6,6,6,6,0,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
+	// 	{4,4,4,4,4,4,0,4,4,4,6,0,6,2,2,2,2,2,2,2,3,3,3,3},
+	// 	{4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
+	// 	{4,0,0,0,0,0,0,0,0,0,0,0,6,2,0,0,5,0,0,2,0,0,0,2},
+	// 	{4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
+	// 	{4,0,6,0,6,0,0,0,0,4,6,0,0,0,0,0,5,0,0,0,0,0,0,2},
+	// 	{4,0,0,5,0,0,0,20,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
+	// 	{4,0,6,0,6,0,0,0,0,4,6,0,6,2,0,0,5,0,0,2,0,0,0,2},
+	// 	{4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
+	// 	{4,4,4,4,4,4,4,4,4,4,1,1,1,2,2,2,2,2,2,3,3,3,3,3}
+	// };
+
 	int worldMap[mapWidth][mapHeight]=
 	{
-		{4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,7,7,7,7,7,7,7,7},
-		{4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
-		{4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
-		{4,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
-		{4,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
-		{4,0,4,0,0,0,0,5,5,5,5,5,5,5,5,5,7,7,0,7,7,7,7,7},
-		{4,0,5,0,0,0,0,5,0,5,0,5,0,5,0,5,7,0,0,0,7,7,7,1},
-		{4,0,6,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
-		{4,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,7,1},
-		{4,0,8,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
-		{4,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,7,7,7,1},
-		{4,0,0,0,0,0,0,5,5,5,5,0,5,5,5,5,7,7,7,7,7,7,7,1},
-		{6,6,6,6,6,6,6,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
-		{8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
-		{6,6,6,6,6,6,0,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
-		{4,4,4,4,4,4,0,4,4,4,6,0,6,2,2,2,2,2,2,2,3,3,3,3},
-		{4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
-		{4,0,0,0,0,0,0,0,0,0,0,0,6,2,0,0,5,0,0,2,0,0,0,2},
-		{4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
-		{4,0,6,0,6,0,0,0,0,4,6,0,0,0,0,0,5,0,0,0,0,0,0,2},
-		{4,0,0,5,0,0,0,20,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
-		{4,0,6,0,6,0,0,0,0,4,6,0,6,2,0,0,5,0,0,2,0,0,0,2},
-		{4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
-		{4,4,4,4,4,4,4,4,4,4,1,1,1,2,2,2,2,2,2,3,3,3,3,3}
+		{1,1,1,1,1,1,1,1},
+		{1,0,0,0,1,2,1,1},
+		{1,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,1},
+		{1,1,0,0,0,0,1,1},
+		{1,1,1,1,1,1,1,1}
 	};
 
 	t_mlx	tx;
@@ -476,8 +489,8 @@ int	main(void)
 
 	tx.sprite = sprite;
 
-	tx.pos_arr[0] = 22;
-	tx.pos_arr[1] = 11.5;
+	tx.pos_arr[0] = 6;
+	tx.pos_arr[1] = 5;
 
 	tx.dir[0] = -1.0;
 	tx.dir[1] = 0.0;
