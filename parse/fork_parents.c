@@ -46,6 +46,9 @@ int	handle_res(int *res, t_cmd_struct *tcst, int index)
 	if (*res == 2)
 	{
 		printf("exit\n");
+		free(tcst->tcmd[0]->arg[0]);
+		free(tcst->tcmd[0]->arg);
+		free_all(tcst);
 		exit(0);
 	}
 	else if (*res == 3)

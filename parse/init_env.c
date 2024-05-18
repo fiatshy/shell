@@ -28,6 +28,7 @@ void	init_env(t_list **lst_env)
 {
 	extern char	**environ;
 
+	*lst_env = ft_lstnew(*environ);
 	while (*environ)
 		ft_lstadd_back(lst_env, ft_lstnew(*environ++));
 }

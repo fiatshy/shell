@@ -15,6 +15,18 @@
 
 int	main(void)
 {
+	//t_list **lst_env;
+	//extern char	**environ;
+	//lst_env = malloc (sizeof(t_list *));
+	//*lst_env = ft_lstnew(*environ);
+	//ft_lstadd_back(lst_env, ft_lstnew(*environ++));
+	//free((*lst_env)->content);
+	//free((*lst_env)->next->content);
+	//free((*lst_env)->next);
+	//free(*lst_env);
+	//free(lst_env);
+	//ft_lstadd_back(lst_env, ft_lstnew(a));
+	
 	t_cmd_struct	*tcst;
 	t_list			**lst_env;
 	int				status;
