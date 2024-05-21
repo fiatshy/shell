@@ -33,16 +33,16 @@ void	trim(t_cmd_struct *tcst, int index, int i)
 	if (delim == NULL)
 	{
 		if (tcst->tcmd[index]->arg[i][0] == '?')
-			printf("%d ", tcst->status);
+			printf("%d", tcst->status);
 		else
-			printf("%s ", tcst->tcmd[index]->arg[i]);
+			printf("%s", tcst->tcmd[index]->arg[i]);
 	}
 	else
 	{
 		if (tcst->tcmd[index]->arg[i][0] == '?')
-			printf("%d ", tcst->status);
+			printf("%d", tcst->status);
 		else
-			printf("%s ", tcst->tcmd[index]->arg[i]);
+			printf("%s", tcst->tcmd[index]->arg[i]);
 	}
 }
 

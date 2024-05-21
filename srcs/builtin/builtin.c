@@ -21,6 +21,8 @@ void	ft_echo(t_cmd_struct *tcst, int index)
 		i = 2;
 		while (tcst->tcmd[index]->arg[i])
 		{
+			if (i != 2)
+				printf(" ");
 			trim(tcst, index, i);
 			i++;
 		}
@@ -30,6 +32,8 @@ void	ft_echo(t_cmd_struct *tcst, int index)
 		i = 1;
 		while (tcst->tcmd[index]->arg[i])
 		{
+			if (i != 1)
+				printf(" ");
 			trim(tcst, index, i);
 			i++;
 		}

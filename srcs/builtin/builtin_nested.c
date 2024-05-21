@@ -14,14 +14,14 @@
 
 void	ft_cd(t_cmd_struct *tcst, int index)
 {
-	if (has_multi_dots(tcst->tcmd[index]->arg[1]) == -1)
-	{
-		printf("No such directory\n");
-		return ;
-	}
 	if (tcst->tcmd[index]->arg[1] == NULL)
 	{
 		chdir("/home/sunghyki");
+		return ;
+	}
+	if (has_multi_dots(tcst->tcmd[index]->arg[1]) == -1)
+	{
+		printf("No such directory\n");
 		return ;
 	}
 	if (has_relative_path(tcst->tcmd[index]->arg[1]))
