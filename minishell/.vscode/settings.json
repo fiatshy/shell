@@ -1,0 +1,15 @@
+{
+	"files.associations": {
+		"libft.h": "c",
+		"*.bkp2": "c",
+		"string": "c",
+		"type_traits": "c",
+		"readline.h": "c",
+		"stat.h": "c",
+		"types.h": "c",
+		"signal.h": "c",
+		"parse_test.h": "c",
+		"refactor": "c",
+		"minishell.h": "c"
+	}
+}
