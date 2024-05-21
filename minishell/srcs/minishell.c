@@ -26,7 +26,8 @@ int	main(void)
 		s = readline("minishell $ ");
 		if (s == 0)
 			exit(0);
-		if (is_empty_command(s[0]) || has_only_spaces(s))
+		if (is_empty_command(s[0]) || has_only_spaces(s) \
+				|| is_empty_string(s) == 1)
 			continue ;
 		add_history(s);
 		init_tcst(&tcst, s, status);

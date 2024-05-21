@@ -27,7 +27,7 @@ void	copy_string_char(t_cmd_struct *tcst, char **s, char *src, int len)
 	ft_memcpy((*s), src, len);
 	(*s)[len] = 0;
 	if (src[0] == '?' && ft_strncmp("expr", tcst->tcmd[0]->arg[0], 4) == 0)
-		(*s)[0] = tcst->status + '0';
+		*s = ft_itoa(tcst->status);
 	if (((*s)[0] == '\'') || ((*s)[0] == '\"'))
 	{
 		delim = (*s)[0];

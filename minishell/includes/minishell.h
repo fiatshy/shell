@@ -283,6 +283,7 @@ void	trim(t_cmd_struct *tcst, int index, int i);
 char	*what_quotes(char *s);
 void	get_file_length(int *i);
 void	write_env(char **arr, t_cmd_struct *tcst, int index);
+int		is_empty_string(char *s);
 
 /* fork parents */
 int		handle_res_nested(int *res, t_cmd_struct *tcst, int index);

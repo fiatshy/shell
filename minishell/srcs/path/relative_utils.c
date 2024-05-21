@@ -34,6 +34,7 @@ void	copy_path(char temp[255], char *src)
 {
 	int	i;
 
+	i = 0;
 	while (temp[i])
 		i++;
 	temp[i] = '/';
