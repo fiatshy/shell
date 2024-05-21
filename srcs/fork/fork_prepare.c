@@ -66,7 +66,7 @@ int	prepare_execute_nested(t_cmd_struct *tcst, int i, int proceed, int cont)
 		i++;
 	}
 	i = -1;
-	while (++i < tcst->no_of_pipes)
+	while (++i < tcst->n)
 		handle_parent(tcst);
 	return (0);
 }

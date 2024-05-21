@@ -16,29 +16,37 @@ void	get_execute_path_nested(int *response, \
 	char *s, char **cmd_path, t_cmd_struct *tcst)
 {
 	int			i;
-	char		*path;
+	char		**path;
 	char		**split_path;
 	struct stat	buf;
+	char		*temp_path;
 
 	path = get_envv(tcst);
 	if (path != NULL)
-		split_path = ft_split(path, ':');
+		split_path = ft_split(path[1], ':');
 	else
 		split_path = NULL;
 	i = 0;
-	if (path == NULL && split_path == NULL)
+	if (path[1] == NULL && split_path == NULL)
 		printf("Wrong Command\n");
+	free(path[0]);
+	free(path[1]);
+	free(path);
 	while (split_path[i])
 	{
-		*cmd_path = ft_strjoin(split_path[i], "/");
-		*cmd_path = ft_strjoin(*cmd_path, s);
+		temp_path = ft_strjoin(split_path[i], "/");
+		free(split_path[i]);
+		*cmd_path = ft_strjoin(temp_path, s);
+		free(temp_path);
 		if (stat(*cmd_path, &buf) == 0)
 		{
 			*response = 1;
 			break ;
 		}
+		free(*cmd_path);
 		i++;
 	}
+	free(split_path);
 }
 
 char	*get_exectue_path(char *s, t_cmd_struct *tcst)
@@ -56,6 +64,8 @@ char	*get_exectue_path(char *s, t_cmd_struct *tcst)
 	else
 		get_execute_path_nested(&response, s, &cmd_path, tcst);
 	if (response == 0)
+	{
 		return (0);
+	}
 	return (cmd_path);
 }

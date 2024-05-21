@@ -241,7 +241,7 @@ void	set_tunnels(t_cmd_struct *tcst, int index);
 
 /* env */
 char	*get_env(void);
-char	*get_envv(t_cmd_struct *tcst);
+char	**get_envv(t_cmd_struct *tcst);
 
 /* get_exec_path */
 void	fork_and_exectue_nested(t_cmd_struct *tcst, int index);

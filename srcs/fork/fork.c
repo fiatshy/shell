@@ -41,6 +41,7 @@ void	fork_nested(int res, t_cmd_struct *tcst, int index)
 		else
 		{
 			execve(command, tcst->tcmd[index]->arg, env);
+			free(command);
 			exit(0);
 		}
 	}

@@ -36,7 +36,7 @@ char	*get_env(void)
 	return (NULL);
 }
 
-char	*get_envv(t_cmd_struct *tcst)
+char	**get_envv(t_cmd_struct *tcst)
 {
 	t_list	*temp;
 	char	**temp_split;
@@ -47,7 +47,7 @@ char	*get_envv(t_cmd_struct *tcst)
 		if (ft_strncmp(temp->content, "PATH", 4) == 0)
 		{
 			temp_split = ft_split(temp->content, '=');
-			return (temp_split[1]);
+			return (temp_split);
 		}
 		temp = temp->next;
 	}
