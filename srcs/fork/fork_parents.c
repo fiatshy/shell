@@ -59,9 +59,8 @@ int	handle_res(int *res, t_cmd_struct *tcst, int index)
 	return (handle_res_nested(res, tcst, index));
 }
 
-void	handle_parent(t_cmd_struct *tcst, int index)
+void	handle_parent(t_cmd_struct *tcst)
 {
 	waitpid(0, &tcst->status, 0);
 	tcst->status = WEXITSTATUS(tcst->status);
-	fork_and_exectue_nested(tcst, index);
 }

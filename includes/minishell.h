@@ -288,7 +288,7 @@ int		is_empty_string(char *s);
 /* fork parents */
 int		handle_res_nested(int *res, t_cmd_struct *tcst, int index);
 int		handle_res(int *res, t_cmd_struct *tcst, int index);
-void	handle_parent(t_cmd_struct *tcst, int index);
+void	handle_parent(t_cmd_struct *tcst);
 
 /* fork */
 void	fork_nested(int res, t_cmd_struct *tcst, int index);

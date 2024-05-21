@@ -63,6 +63,6 @@ int	fork_and_execute(t_cmd_struct *tcst, int index)
 		fork_nested(res, tcst, index);
 	}
 	else if (res != 3 || res != 4)
-		handle_parent(tcst, index);
+		fork_and_exectue_nested(tcst, index);
 	return (0);
 }
