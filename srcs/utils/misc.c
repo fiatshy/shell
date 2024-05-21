@@ -89,13 +89,13 @@ void	write_env(char **arr, t_cmd_struct *tcst, int index)
 
 int	is_empty_string(char *s)
 {
-	int	flag;
+	int		flag;
 
 	flag = 1;
-	s = ft_strtrim(s, "'\"");
 	while (*s)
 	{
-		if ((9 > *s || *s > 13) && (*s != 32))
+		if ((9 > *s || *s > 13) && (*s != 32) \
+				&& (*s != '\"' && *s != '\''))
 			flag = 0;
 		s++;
 	}

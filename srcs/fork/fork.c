@@ -51,18 +51,11 @@ int	fork_and_execute(t_cmd_struct *tcst, int index)
 {
 	int		pid;
 	int		res;
-	char	*status;
 
 	if (handle_res(&res, tcst, index) == 1)
 		return (0);
 	signal(SIGINT, handle_interrupt_blocked);
 	signal(SIGQUIT, handle_interrupt_blocked);
-	status = get_exectue_path(tcst->tcmd[index]->arg[0], tcst);
-	if (status == 0)
-	{
-		tcst->status = 126;
-		return (0);
-	}	
 	pid = fork();
 	if (pid == 0)
 	{
