@@ -12,8 +12,6 @@
 
 #include "minishell.h"
 
-int	flag;
-
 void	set_redirect_args(t_cmd_struct *tcst, int *index, int k)
 {
 	if (k == 0 && ft_strncmp(tcst->trst->split_again[k], "<", 1) \
@@ -42,34 +40,15 @@ void	set_redirect_args(t_cmd_struct *tcst, int *index, int k)
 	}
 }
 
-void	test()
-{
-	exit(1);
-}
-
 void	handle_redirect_delim_nested(t_cmd_struct *tcst, int k)
 {
-	char	*temp;
+	int		pid;
 
-	flag = 0;
 	signal(SIGINT, SIG_IGN);
-	int	pid = fork();
+	pid = fork();
 	if (pid == 0)
 	{
-		signal(SIGINT, test);
-		while (1)
-		{
-			temp = readline("heredoc >> ");
-			if (ft_strncmp(temp, tcst->trst->split_again[k + 1], \
-				ft_strlen(temp)) == 0)
-				break ;
-			else
-			{
-				write(tcst->tfd[tcst->tfd_index[0]].tmp, temp, ft_strlen(temp));
-				write(tcst->tfd[tcst->tfd_index[0]].tmp, "\n", 1);
-			}
-		}
-		flag = 1;
+		delim_nested_loop(tcst, k);
 		exit(0);
 	}
 	else

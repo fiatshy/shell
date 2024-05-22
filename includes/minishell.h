@@ -296,6 +296,7 @@ void	fork_and_exectue_nested(t_cmd_struct *tcst, int index);
 int		fork_and_execute(t_cmd_struct *tcst, int index);
 void	free_child(t_cmd_struct *tcst);
 
+
 /* grouping */
 int		check_grouping_or(t_cmd_struct *tcst, int *i, int *proceed);
 int		check_grouping_and(t_cmd_struct *tcst, int *i, int *proceed);
@@ -336,5 +337,7 @@ int		prepare_execute_nested_andor(t_cmd_struct *tcst, \
 int		fork_and_execute_andor(t_cmd_struct *tcst, int index);
 void	path_nested(char **cmd_path, char *s, char **split_path, int *response);
 void	free_path(char **path);
+void	heredoc_signal(int signo);
+void	delim_nested_loop(t_cmd_struct *tcst, int k);
 
 #endif

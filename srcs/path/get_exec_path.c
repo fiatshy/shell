@@ -63,7 +63,7 @@ void	get_execute_path_nested(int *response, \
 }
 
 char	*get_exectue_path(char *s, t_cmd_struct *tcst)
-{	
+{
 	struct stat	buf;
 	char		*cmd_path;
 	int			response;

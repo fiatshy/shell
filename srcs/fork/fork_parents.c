@@ -66,3 +66,22 @@ void	handle_parent(t_cmd_struct *tcst)
 	waitpid(0, &tcst->status, 0);
 	tcst->status = WEXITSTATUS(tcst->status);
 }
+
+void	delim_nested_loop(t_cmd_struct *tcst, int k)
+{
+	char	*temp;
+
+	signal(SIGINT, heredoc_signal);
+	while (1)
+	{
+		temp = readline("heredoc >> ");
+		if (ft_strncmp(temp, tcst->trst->split_again[k + 1], \
+			ft_strlen(temp)) == 0)
+			break ;
+		else
+		{
+			write(tcst->tfd[tcst->tfd_index[0]].tmp, temp, ft_strlen(temp));
+			write(tcst->tfd[tcst->tfd_index[0]].tmp, "\n", 1);
+		}
+	}
+}

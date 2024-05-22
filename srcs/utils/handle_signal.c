@@ -39,3 +39,9 @@ int	check_if_ctrl_d(char *s)
 	}
 	return (1);
 }
+
+void	heredoc_signal(int signo)
+{
+	(void) signo;
+	exit(1);
+}
