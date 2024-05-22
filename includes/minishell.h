@@ -96,7 +96,7 @@ typedef struct s_cmd_struct
 	t_cmd			**tcmd;
 	t_fds			tfd[10];
 	t_red_struct	*trst;
-	struct s_pipe	tpipe[10];
+	struct s_pipe	tpipe[20];
 }		t_cmd_struct;
 
 typedef struct s_var

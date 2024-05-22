@@ -70,7 +70,7 @@ void	main_init(int *status)
 
 void	main_check_pipe(t_cmd_struct *tcst)
 {
-	if (tcst->no_of_pipes <= 5)
+	if (tcst->no_of_pipes <= 100)
 	{
 		init_pipe(tcst);
 		prepare_execute(tcst);

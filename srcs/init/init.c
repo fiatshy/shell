@@ -19,7 +19,7 @@ void	init_tcst(t_cmd_struct **tcst, char *s, int status)
 	(*tcst)->n = get_no_of_command(s);
 	if ((*tcst)->n == 0)
 		(*tcst)->n = 1;
-	(*tcst)->tcmd = malloc (sizeof(t_cmd));
+	(*tcst)->tcmd = malloc (sizeof(t_cmd *) * (*tcst)->n);
 	i = 0;
 	while (i < (*tcst)->n)
 	{
