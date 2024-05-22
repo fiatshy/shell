@@ -12,6 +12,8 @@
 
 #include "minishell.h"
 
+int	flag;
+
 void	set_redirect_args(t_cmd_struct *tcst, int *index, int k)
 {
 	if (k == 0 && ft_strncmp(tcst->trst->split_again[k], "<", 1) \
@@ -40,21 +42,41 @@ void	set_redirect_args(t_cmd_struct *tcst, int *index, int k)
 	}
 }
 
+void	test()
+{
+	exit(1);
+}
+
 void	handle_redirect_delim_nested(t_cmd_struct *tcst, int k)
 {
 	char	*temp;
 
-	while (1)
+	flag = 0;
+	signal(SIGINT, SIG_IGN);
+	int	pid = fork();
+	if (pid == 0)
 	{
-		temp = readline("heredoc >> ");
-		if (ft_strncmp(temp, tcst->trst->split_again[k + 1], \
-			ft_strlen(temp)) == 0)
-			break ;
-		else
+		signal(SIGINT, test);
+		while (1)
 		{
-			write(tcst->tfd[tcst->tfd_index[0]].tmp, temp, ft_strlen(temp));
-			write(tcst->tfd[tcst->tfd_index[0]].tmp, "\n", 1);
+			temp = readline("heredoc >> ");
+			if (ft_strncmp(temp, tcst->trst->split_again[k + 1], \
+				ft_strlen(temp)) == 0)
+				break ;
+			else
+			{
+				write(tcst->tfd[tcst->tfd_index[0]].tmp, temp, ft_strlen(temp));
+				write(tcst->tfd[tcst->tfd_index[0]].tmp, "\n", 1);
+			}
 		}
+		flag = 1;
+		exit(0);
+	}
+	else
+	{
+		waitpid(0, &tcst->status, 0);
+		if (tcst->status != 0)
+			printf("\n");
 	}
 	close(tcst->tfd[tcst->tfd_index[0]].tmp);
 	tcst->tfd[tcst->tfd_index[0]].tmp = open("tmp", O_RDWR);
