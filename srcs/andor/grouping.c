@@ -20,6 +20,7 @@ int	check_grouping_or(t_cmd_struct *tcst, int *i, int *proceed)
 		if (tcst->open)
 		{
 			*i += get_closed_index(tcst, *i);
+			*i += 1;
 			tcst->open = 0;
 			return (-1);
 		}

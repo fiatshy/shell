@@ -53,3 +53,36 @@ int	exec_builtin(t_cmd_struct *tcst, int index)
 		ft_unset(tcst, index);
 	return (1);
 }
+
+int	has_only_spaces(char *s)
+{
+	while (*s)
+	{
+		if (*s != ' ' && *s != '\t')
+			return (0);
+		s++;
+	}
+	return (1);
+}
+
+int	is_empty_command(char s)
+{
+	if (s == 0)
+		return (1);
+	return (0);
+}
+
+int	has_andor(t_cmd_struct *tcst)
+{
+	int	i;
+
+	i = -1;
+	while (++i < tcst->n)
+	{
+		if (tcst->tcmd[i]->next_delimiter != NULL
+			&& ((tcst->tcmd[i]->next_delimiter[1] == '|')
+				|| (tcst->tcmd[i]->next_delimiter[1] == '&')))
+			return (1);
+	}
+	return (0);
+}

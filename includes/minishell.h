@@ -294,6 +294,7 @@ void	handle_parent(t_cmd_struct *tcst);
 void	fork_nested(int res, t_cmd_struct *tcst, int index);
 void	fork_and_exectue_nested(t_cmd_struct *tcst, int index);
 int		fork_and_execute(t_cmd_struct *tcst, int index);
+void	free_child(t_cmd_struct *tcst);
 
 /* grouping */
 int		check_grouping_or(t_cmd_struct *tcst, int *i, int *proceed);
@@ -328,5 +329,12 @@ int		prepare_execute(t_cmd_struct *tcst);
 int		has_only_spaces(char *s);
 int		is_empty_command(char s);
 int		check_wrong_redirection(char *s);
+
+int		has_andor(t_cmd_struct *tcst);
+int		prepare_execute_nested_andor(t_cmd_struct *tcst, \
+			int i, int proceed, int cont);
+int		fork_and_execute_andor(t_cmd_struct *tcst, int index);
+void	path_nested(char **cmd_path, char *s, char **split_path, int *response);
+void	free_path(char **path);
 
 #endif

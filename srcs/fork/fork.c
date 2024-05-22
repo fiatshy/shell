@@ -47,10 +47,20 @@ void	fork_nested(int res, t_cmd_struct *tcst, int index)
 	}
 }
 
-int	fork_and_execute(t_cmd_struct *tcst, int index)
+void	free_child(t_cmd_struct *tcst)
+{
+	free(tcst->tcmd[0]->arg[0]);
+	free(tcst->tcmd[0]->arg);
+	ft_lstclear(tcst->lst_env, free);
+	free(tcst->lst_env);
+	free_all(tcst);
+}
+
+int	fork_and_execute_andor(t_cmd_struct *tcst, int index)
 {
 	int		pid;
 	int		res;
+	int		temp;
 
 	if (handle_res(&res, tcst, index) == 1)
 		return (0);
@@ -61,12 +71,36 @@ int	fork_and_execute(t_cmd_struct *tcst, int index)
 	{
 		set_tunnels(tcst, index);
 		fork_nested(res, tcst, index);
-		free(tcst->tcmd[0]->arg[0]);
-		free(tcst->tcmd[0]->arg);
-		ft_lstclear(tcst->lst_env, free);
-		free(tcst->lst_env);
-		free_all(tcst);
-		exit(0);
+		temp = tcst->status;
+		free_child(tcst);
+		exit(temp);
+	}
+	else if (res != 3 || res != 4)
+	{
+		handle_parent(tcst);
+		fork_and_exectue_nested(tcst, index);
+	}
+	return (0);
+}
+
+int	fork_and_execute(t_cmd_struct *tcst, int index)
+{
+	int		pid;
+	int		res;
+	int		temp;
+
+	if (handle_res(&res, tcst, index) == 1)
+		return (0);
+	signal(SIGINT, handle_interrupt_blocked);
+	signal(SIGQUIT, handle_interrupt_blocked);
+	pid = fork();
+	if (pid == 0)
+	{
+		set_tunnels(tcst, index);
+		fork_nested(res, tcst, index);
+		temp = tcst->status;
+		free_child(tcst);
+		exit(temp);
 	}
 	else if (res != 3 || res != 4)
 		fork_and_exectue_nested(tcst, index);

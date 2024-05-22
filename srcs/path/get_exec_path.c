@@ -12,26 +12,20 @@
 
 #include "minishell.h"
 
-void	get_execute_path_nested(int *response, \
-	char *s, char **cmd_path, t_cmd_struct *tcst)
+void	free_path(char **path)
 {
-	int			i;
-	char		**path;
-	char		**split_path;
-	struct stat	buf;
-	char		*temp_path;
-
-	path = get_envv(tcst);
-	if (path != NULL)
-		split_path = ft_split(path[1], ':');
-	else
-		split_path = NULL;
-	i = 0;
-	if (path[1] == NULL && split_path == NULL)
-		printf("Wrong Command\n");
 	free(path[0]);
 	free(path[1]);
 	free(path);
+}
+
+void	path_nested(char **cmd_path, char *s, char **split_path, int *response)
+{
+	int			i;
+	char		*temp_path;
+	struct stat	buf;
+
+	i = 0;
 	while (split_path[i])
 	{
 		temp_path = ft_strjoin(split_path[i], "/");
@@ -46,6 +40,23 @@ void	get_execute_path_nested(int *response, \
 		free(*cmd_path);
 		i++;
 	}
+}
+
+void	get_execute_path_nested(int *response, \
+	char *s, char **cmd_path, t_cmd_struct *tcst)
+{
+	char		**path;
+	char		**split_path;
+
+	path = get_envv(tcst);
+	if (path != NULL)
+		split_path = ft_split(path[1], ':');
+	else
+		split_path = NULL;
+	if (path[1] == NULL && split_path == NULL)
+		printf("Wrong Command\n");
+	free_path(path);
+	path_nested(cmd_path, s, split_path, response);
 	free(split_path);
 }
 
@@ -65,6 +76,7 @@ char	*get_exectue_path(char *s, t_cmd_struct *tcst)
 		get_execute_path_nested(&response, s, &cmd_path, tcst);
 	if (response == 0)
 	{
+		tcst->status = 127;
 		return (0);
 	}
 	return (cmd_path);
