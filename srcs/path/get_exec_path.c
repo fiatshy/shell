@@ -55,7 +55,6 @@ void	get_execute_path_nested(int *response, \
 		split_path = NULL;
 	if (path == NULL && split_path == NULL)
 	{
-		printf("Wrong Command\n");
 		return ;
 	}
 	free_path(path);
