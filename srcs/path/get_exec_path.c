@@ -53,8 +53,11 @@ void	get_execute_path_nested(int *response, \
 		split_path = ft_split(path[1], ':');
 	else
 		split_path = NULL;
-	if (path[1] == NULL && split_path == NULL)
+	if (path == NULL && split_path == NULL)
+	{
 		printf("Wrong Command\n");
+		return ;
+	}
 	free_path(path);
 	path_nested(cmd_path, s, split_path, response);
 	free(split_path);
