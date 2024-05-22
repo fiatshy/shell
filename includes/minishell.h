@@ -225,7 +225,7 @@ void	copy_string(t_cmd **tcmd, char *src, int len);
 void	copy_string_char(t_cmd_struct *tcst, char **s, char *src, int len);
 void	check_redirection(char **s, bool *quote, int *count);
 void	main_check_pipe(t_cmd_struct *tcst);
-void	main_init(int *status, t_list ***lst_env);
+void	main_init(int *status);
 
 /* handle_signal */
 void	handle_interrupt(int signo);

@@ -83,6 +83,8 @@ int	free_all(t_cmd_struct *tcst)
 		free(tcst->tcmd[i]);
 		i++;
 	}
+	//ft_lstclear(tcst->lst_env, free);
+	//free(tcst->lst_env);
 	free(tcst->tcmd);
 	free(tcst);
 	return (temp);

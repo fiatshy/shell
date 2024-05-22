@@ -20,7 +20,9 @@ int	main(void)
 	int				status;
 	char			*s;
 
-	main_init(&status, &lst_env);
+	main_init(&status);
+	lst_env = malloc (sizeof(t_list *));
+	init_env(lst_env);
 	while (1)
 	{
 		s = readline("minishell $ ");

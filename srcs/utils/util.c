@@ -61,11 +61,9 @@ void	check_redirection(char **s, bool *quote, int *count)
 	}
 }
 
-void	main_init(int *status, t_list ***lst_env)
+void	main_init(int *status)
 {
 	*status = 0;
-	*lst_env = malloc (sizeof(t_list *));
-	init_env(*lst_env);
 	signal(SIGINT, handle_interrupt);
 	signal(SIGQUIT, SIG_IGN);
 }

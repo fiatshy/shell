@@ -48,6 +48,8 @@ int	handle_res(int *res, t_cmd_struct *tcst, int index)
 		printf("exit\n");
 		free(tcst->tcmd[0]->arg[0]);
 		free(tcst->tcmd[0]->arg);
+		ft_lstclear(tcst->lst_env, free);
+		free(tcst->lst_env);
 		free_all(tcst);
 		exit(0);
 	}

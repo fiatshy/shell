@@ -45,7 +45,6 @@ void	fork_nested(int res, t_cmd_struct *tcst, int index)
 			exit(0);
 		}
 	}
-	exit(0);
 }
 
 int	fork_and_execute(t_cmd_struct *tcst, int index)
@@ -62,6 +61,12 @@ int	fork_and_execute(t_cmd_struct *tcst, int index)
 	{
 		set_tunnels(tcst, index);
 		fork_nested(res, tcst, index);
+		free(tcst->tcmd[0]->arg[0]);
+		free(tcst->tcmd[0]->arg);
+		ft_lstclear(tcst->lst_env, free);
+		free(tcst->lst_env);
+		free_all(tcst);
+		exit(0);
 	}
 	else if (res != 3 || res != 4)
 		fork_and_exectue_nested(tcst, index);
