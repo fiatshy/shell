@@ -13,6 +13,19 @@
 #include "libft/libft.h"
 #include "minishell.h"
 
+static void	inner_main(t_cmd_struct *tcst, char *s)
+{
+	int	i;
+
+	copy_string_char(tcst, &(tcst->s), s, ft_strlen(s));
+	init_tcmd(tcst);
+	tcst->no_of_pipes = get_no_of_pipes(tcst);
+	main_check_pipe(tcst);
+	i = -1;
+	while (++i < tcst->no_of_pipes)
+		close(tcst->tpipe[i].fd[1]);
+}
+
 int	main(void)
 {
 	t_cmd_struct	*tcst;
@@ -20,6 +33,7 @@ int	main(void)
 	int				status;
 	char			*s;
 
+	s = NULL;
 	main_init(&status);
 	lst_env = malloc (sizeof(t_list *));
 	init_env(lst_env);
@@ -34,10 +48,7 @@ int	main(void)
 		add_history(s);
 		init_tcst(&tcst, s, status);
 		tcst->lst_env = lst_env;
-		copy_string_char(tcst, &(tcst->s), s, ft_strlen(s));
-		init_tcmd(tcst);
-		tcst->no_of_pipes = get_no_of_pipes(tcst);
-		main_check_pipe(tcst);
+		inner_main(tcst, s);
 		status = free_all(tcst);
 	}
 }

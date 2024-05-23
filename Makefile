@@ -1,6 +1,6 @@
 TARGET = minishell
 CC	= gcc
-FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror -g
 FLAG_BONUS = 0
 
 H = $(addprefix -I, $(HEADER_DIR))

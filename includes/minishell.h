@@ -296,7 +296,6 @@ void	fork_and_exectue_nested(t_cmd_struct *tcst, int index);
 int		fork_and_execute(t_cmd_struct *tcst, int index);
 void	free_child(t_cmd_struct *tcst);
 
-
 /* grouping */
 int		check_grouping_or(t_cmd_struct *tcst, int *i, int *proceed);
 int		check_grouping_and(t_cmd_struct *tcst, int *i, int *proceed);
