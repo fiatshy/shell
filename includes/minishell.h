@@ -186,12 +186,14 @@ int		has_expr(char *s);
 void	set_arguments_nested(t_cmd *tcmd, int i, \
 	t_cmd_struct *tcst, char **split_arg);
 int		set_arguments(t_cmd *tcmd, t_cmd_struct *tcst);
+int		has_only_spaces_check(char *s);
 
 /*init*/
 void	init_tcst(t_cmd_struct **tcst, char *s, int status);
 void	init_tcmd_set_openclose(t_cmd_struct *tcst, char **split, int i);
-void	init_tcmd(t_cmd_struct *tcst);
+int		init_tcmd(t_cmd_struct *tcst);
 void	free_init_tcmd(char **split, char *trim_str);
+int		init_tcmd_nested(t_cmd_struct *tcst, char **split, char *temp, int i);
 
 /*init_fd_pipe*/
 void	init_fds(t_cmd_struct *tcst);

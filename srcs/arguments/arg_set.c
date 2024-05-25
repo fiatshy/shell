@@ -12,6 +12,17 @@
 
 #include "minishell.h"
 
+int	has_only_spaces_check(char *s)
+{
+	while (*s)
+	{
+		if (*s != ' ')
+			return (0);
+		s++;
+	}
+	return (1);
+}
+
 void	set_arguments_nested(t_cmd *tcmd, int i, \
 	t_cmd_struct *tcst, char **split_arg)
 {

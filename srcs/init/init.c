@@ -53,7 +53,24 @@ void	init_tcmd_set_openclose(t_cmd_struct *tcst, char **split, int i)
 		tcst->tcmd[i]->close = true;
 }
 
-void	init_tcmd(t_cmd_struct *tcst)
+int	init_tcmd_nested(t_cmd_struct *tcst, char **split, char *temp, int i)
+{
+	if (tcst->tcmd[i]->next_delimiter != 0 && \
+			(split[1] == 0 || has_only_spaces_check(split[1]) == 1) && \
+			*tcst->tcmd[i]->next_delimiter == '|')
+	{
+		free(temp);
+		free(split[0]);
+		if (split[1] != 0)
+			free(split[1]);
+		free(split);
+		return (-1);
+	}
+	init_tcmd_set_openclose(tcst, split, i);
+	return (0);
+}
+
+int	init_tcmd(t_cmd_struct *tcst)
 {
 	int		i;
 	char	**split;
@@ -68,7 +85,8 @@ void	init_tcmd(t_cmd_struct *tcst)
 		tcst->tcmd[i]->next_delimiter = get_first_delimiter(temp);
 		set_pipe_index(tcst, i);
 		split = ft_split_first(temp);
-		init_tcmd_set_openclose(tcst, split, i);
+		if (init_tcmd_nested(tcst, split, temp, i) == -1)
+			return (-1);
 		trim_str = ft_strtrim(split[0], " ()");
 		copy_string(&tcst->tcmd[i], trim_str, ft_strlen(trim_str));
 		if (temp != NULL)
@@ -78,4 +96,5 @@ void	init_tcmd(t_cmd_struct *tcst)
 		free_init_tcmd(split, trim_str);
 		i++;
 	}
+	return (0);
 }
