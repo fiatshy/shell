@@ -38,6 +38,7 @@ void	free_noquote_dollar(char **split_env)
 {
 	free(split_env[0]);
 	free(split_env[1]);
+	free(split_env[2]);
 	free(split_env);
 }
 

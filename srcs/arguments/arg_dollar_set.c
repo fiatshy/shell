@@ -15,13 +15,14 @@
 void	handle_dollar_compare(char split_env[4][100], \
 	char **split_arg, int i, char **split_env_input)
 {
-	char	*result_string;
 	int		front_len;
 	int		env_len;
 	int		end_len;
+	char	result_string[255];
 
-	result_string = malloc (ft_strlen(split_env[0]) + \
-		ft_strlen(split_env[2]) + ft_strlen(split_env_input[1]));
+	(void) i;
+	(void) split_arg;
+	ft_memset(result_string, 0, 255);
 	front_len = ft_strlen(split_env[0]);
 	ft_memcpy(result_string, split_env[0], front_len);
 	env_len = ft_strlen(split_env_input[1]);
@@ -30,7 +31,8 @@ void	handle_dollar_compare(char split_env[4][100], \
 	ft_memcpy(result_string + front_len + env_len, split_env[2], end_len);
 	result_string[front_len + env_len + end_len] = 0;
 	free(split_arg[i]);
-	split_arg[i] = result_string;
+	split_arg[i] = malloc (ft_strlen(result_string) + 1);
+	ft_memcpy(split_arg[i], result_string, ft_strlen(result_string) + 1);
 }
 
 void	handle_flag(char **split_arg, int i)
@@ -58,6 +60,7 @@ void	handle_dollar_nested(char split_env[4][100], \
 		{
 			flag = false;
 			handle_dollar_compare(split_env, split_arg, i, split_env_input);
+			free_env_input(split_env_input);
 			break ;
 		}
 		free_env_input(split_env_input);

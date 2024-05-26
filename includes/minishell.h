@@ -110,6 +110,9 @@ void	set_pipe_head(t_cmd_struct *tcst);
 void	set_pipe_body(t_cmd_struct *tcst, int cmd_index);
 void	set_pipe_tail(t_cmd_struct *tcst);
 
+/* ft_split_dollar */
+char	**ft_split_dollar(char const *s, char c);
+
 /* ft_split_first */
 void	count_words_first_nested(const char *s, int i, bool *quote);
 size_t	count_words_first(char const *s, char c);

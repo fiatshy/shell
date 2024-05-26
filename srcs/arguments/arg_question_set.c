@@ -22,12 +22,15 @@ void	make_question_mark(char **s)
 
 int	handle_question(char **s)
 {
-	(*s) = ft_strtrim((*s), "$");
-	if ((*s)[0] == '?')
+	char	*temp;
+	temp = ft_strtrim((*s), "$");
+	if (temp[0] == '?')
 	{
 		make_question_mark(s);
+		free(temp);
 		return (1);
 	}
+	free(temp);
 	return (0);
 }
 
@@ -35,17 +38,20 @@ void	handle_noquote_dollar(char **s, t_cmd_struct *tcst)
 {
 	t_list	*temp;
 	int		flag;
+	char	*var;
 
 	flag = true;
 	temp = *tcst->lst_env;
 	if (handle_question(s) == 1)
 		return ;
+	var = ft_strtrim(*s, "$");
 	while (temp)
 	{
-		if (ft_strncmp(temp->content, *s, ft_strlen(*s)) == 0)
+		if (ft_strncmp(temp->content, var, ft_strlen(var)) == 0)
 		{
 			flag = false;
 			noquote_nested(s, temp);
+			free(var);
 			break ;
 		}
 		temp = temp->next;

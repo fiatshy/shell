@@ -24,6 +24,7 @@ SRCS_SPLIT = split/ft_split_first.c \
 				split/ft_split_quote_nested.c \
 				split/ft_split_string.c \
 				split/ft_split_string_nested.c \
+				split/ft_split_dollar.c \
 
 SRCS_INIT = init/init.c \
 				init/init_env.c \

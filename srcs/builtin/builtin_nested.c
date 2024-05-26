@@ -39,6 +39,19 @@ int	ft_env(t_cmd_struct *tcst)
 	return (0);
 }
 
+void	free_split_env(char **split_env)
+{
+	int	i;
+
+	i = 0;
+	while (split_env[i])
+	{
+		free(split_env[i]);
+		i++;
+	}
+	free(split_env);
+}
+
 void	ft_export(t_cmd_struct *tcst, int index)
 {
 	t_list	*temp;
@@ -58,8 +71,10 @@ void	ft_export(t_cmd_struct *tcst, int index)
 			ft_memcpy(temp->content, tcst->tcmd[index]->arg[1], \
 				ft_strlen(tcst->tcmd[index]->arg[1]) + 1);
 			flag = false;
+			free_split_env(split_env);
 			break ;
 		}
+		free_split_env(split_env);
 		temp = temp->next;
 	}
 	if (flag)
