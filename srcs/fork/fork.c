@@ -16,7 +16,11 @@ void	fork_and_exectue_nested(t_cmd_struct *tcst, int index)
 {
 	if (tcst->tcmd[index]->pipe_index < tcst->no_of_pipes \
 			&& tcst->tcmd[index]->pipe_index != -1)
+	{
+		if (ft_strncmp("cat", tcst->tcmd[index]->arg[0], 3) == 0)
+			close(tcst->tpipe[tcst->tcmd[index]->pipe_index].fd[0]);
 		close(tcst->tpipe[tcst->tcmd[index]->pipe_index].fd[1]);
+	}	
 }
 
 void	fork_nested(int res, t_cmd_struct *tcst, int index)
