@@ -47,26 +47,37 @@ size_t	count_length_dollar(char const *s, char *c, size_t *i)
 	return (j);
 }
 
+static void	dollar_nested(int *idx, size_t *i, int *flag)
+{
+	(*idx)++;
+	if (*flag)
+	{
+		*flag = 0;
+		(*i)++;
+	}
+}
+
 char	**split_arr_dollar(char **split, char const *s, char c)
 {
 	size_t	i;
 	size_t	j;
-	size_t	idx;
+	int		idx;
+	int		flag;
 
 	i = 0;
 	idx = 0;
+	flag = 1;
 	while (*(s + i))
 	{
 		if (*(s + i) != c)
 		{
 			j = count_length_dollar(s, &c, &i);
-			split[idx] = (char *) malloc (sizeof(char) * (j + 1));
+			split[idx] = (char *) malloc (j + 1);
 			if (split[idx] == 0)
 				return (0);
 			ft_memcpy(split[idx], s + i - j, j);
 			split[idx][j] = '\0';
-			idx++;
-			i++;
+			dollar_nested(&idx, &i, &flag);
 		}
 		else
 			i++;

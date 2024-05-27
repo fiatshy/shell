@@ -54,7 +54,7 @@ void	handle_dollar_nested(char split_env[4][100], \
 	temp = *tcst->lst_env;
 	while (temp)
 	{
-		split_env_input = ft_split(temp->content, '=');
+		split_env_input = ft_split_dollar(temp->content, '=');
 		if (ft_strncmp(split_env[1], split_env_input[0], \
 			ft_strlen(split_env_input[0])) == 0)
 		{

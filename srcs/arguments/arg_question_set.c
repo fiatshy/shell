@@ -23,6 +23,7 @@ void	make_question_mark(char **s)
 int	handle_question(char **s)
 {
 	char	*temp;
+
 	temp = ft_strtrim((*s), "$");
 	if (temp[0] == '?')
 	{
@@ -57,7 +58,10 @@ void	handle_noquote_dollar(char **s, t_cmd_struct *tcst)
 		temp = temp->next;
 	}
 	if (flag)
+	{
+		free(var);
 		make_blank_string(s);
+	}
 }
 
 int	has_expr(char *s)

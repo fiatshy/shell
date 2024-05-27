@@ -46,7 +46,7 @@ void	noquote_nested(char **s, t_list *temp)
 {
 	char	**split_env;
 
-	split_env = ft_split(temp->content, '=');
+	split_env = ft_split_dollar(temp->content, '=');
 	free(*s);
 	*s = malloc (ft_strlen(split_env[1]) + 1);
 	ft_memcpy(*s, split_env[1], ft_strlen(split_env[1]));
