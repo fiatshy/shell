@@ -74,6 +74,9 @@ void	wait_for_child(t_cmd_struct *tcst)
 	int	i;
 
 	i = -1;
+	while (++i < tcst->no_of_pipes)
+		close(tcst->tpipe[tcst->tcmd[i]->pipe_index].fd[0]);
+	i = -1;
 	while (++i < tcst->n)
 		handle_parent(tcst);
 }
