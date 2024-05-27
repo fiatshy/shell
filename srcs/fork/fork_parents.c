@@ -40,31 +40,34 @@ int	handle_res_nested(int *res, t_cmd_struct *tcst, int index)
 	return (0);
 }
 
-int	handle_res(int *res, t_cmd_struct *tcst, int index)
+void	handle_exit(t_cmd_struct *tcst)
 {
 	int	length;
 
+	length = 0;
+	while (tcst->tcmd[0]->arg[length])
+		length++;
+	if (length > 2)
+		printf("too many variables\n");
+	else
+	{
+		printf("exit\n");
+		free(tcst->tcmd[0]->arg[0]);
+		free(tcst->tcmd[0]->arg);
+		ft_lstclear(tcst->lst_env, free);
+		free(tcst->lst_env);
+		free_all(tcst);
+		exit(0);
+	}
+}
+
+int	handle_res(int *res, t_cmd_struct *tcst, int index)
+{
 	*res = is_builtin(tcst, index);
 	if (handle_builtin_nested(tcst, index, res) == 1)
 		return (1);
 	if (*res == 2)
-	{
-		length = 0;
-		while (tcst->tcmd[0]->arg[length])
-			length++;
-		if (length > 2)
-			printf("too many variables\n");	
-		else
-		{
-			printf("exit\n");
-			free(tcst->tcmd[0]->arg[0]);
-			free(tcst->tcmd[0]->arg);
-			ft_lstclear(tcst->lst_env, free);
-			free(tcst->lst_env);
-			free_all(tcst);
-			exit(0);
-		}
-	}
+		handle_exit(tcst);
 	else if (*res == 3)
 	{
 		ft_cd(tcst, index);
