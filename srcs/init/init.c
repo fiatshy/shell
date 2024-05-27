@@ -31,6 +31,7 @@ void	init_tcst(t_cmd_struct **tcst, char *s, int status)
 	(*tcst)->tfd_index[1] = 0;
 	(*tcst)->tfd_index[2] = 0;
 	(*tcst)->tfd_index[3] = 0;
+	(*tcst)->builtin = 0;
 	init_fds(*tcst);
 }
 

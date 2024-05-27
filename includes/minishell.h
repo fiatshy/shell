@@ -89,6 +89,7 @@ typedef struct s_cmd_struct
 	int				no_of_pipes;
 	int				status;
 	int				open;
+	int				builtin;
 	char			*s;
 	char			*current;
 	t_list			**lst_env;

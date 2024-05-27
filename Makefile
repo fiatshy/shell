@@ -1,7 +1,6 @@
 TARGET = minishell
 CC	= gcc
-FLAGS = -Wall -Wextra -Werror
-FLAG_BONUS = 0
+FLAGS = -Wall -Wextra -Werror -g
 
 H = $(addprefix -I, $(HEADER_DIR))
 HEADER_DIR = ./includes/

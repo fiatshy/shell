@@ -69,16 +69,23 @@ int	prepare_execute_nested_andor(t_cmd_struct *tcst, \
 	return (0);
 }
 
-void	wait_for_child(t_cmd_struct *tcst)
+int	wait_for_child(t_cmd_struct *tcst)
 {
 	int	i;
+	int	temp;
 
 	i = -1;
 	while (++i < tcst->no_of_pipes)
 		close(tcst->tpipe[tcst->tcmd[i]->pipe_index].fd[0]);
 	i = -1;
+	temp = tcst->status;
 	while (++i < tcst->n)
 		handle_parent(tcst);
+	if (tcst->builtin == 0)
+		return (tcst->status);
+	else if (tcst->builtin == 1)
+		return (temp);
+	return (0);
 }
 
 int	prepare_execute_nested(t_cmd_struct *tcst, int i, int proceed, int cont)
@@ -106,7 +113,7 @@ int	prepare_execute_nested(t_cmd_struct *tcst, int i, int proceed, int cont)
 		}
 		i++;
 	}
-	wait_for_child(tcst);
+	tcst->status = wait_for_child(tcst);
 	return (0);
 }
 

@@ -14,6 +14,7 @@
 
 void	ft_cd(t_cmd_struct *tcst, int index)
 {
+	tcst->builtin = 1;
 	if (tcst->tcmd[index]->arg[1] == NULL)
 	{
 		chdir("/home/sunghyki");
@@ -28,6 +29,7 @@ void	ft_cd(t_cmd_struct *tcst, int index)
 		chdir(get_relative_path(tcst, index));
 	else
 	{
+		tcst->status = 127;
 		if (chdir(ft_strtrim(tcst->tcmd[index]->arg[1], "\"")) == -1)
 			printf("No such directory\n");
 	}
