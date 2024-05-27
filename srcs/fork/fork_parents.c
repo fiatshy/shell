@@ -45,11 +45,8 @@ int	handle_res(int *res, t_cmd_struct *tcst, int index)
 	int	length;
 
 	*res = is_builtin(tcst, index);
-	if (*res == 1)
-	{
-		ft_echo(tcst, index);
+	if (handle_builtin_nested(tcst, index, res) == 1)
 		return (1);
-	}
 	if (*res == 2)
 	{
 		length = 0;

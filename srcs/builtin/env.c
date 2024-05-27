@@ -53,3 +53,23 @@ char	**get_envv(t_cmd_struct *tcst)
 	}
 	return (NULL);
 }
+
+int	handle_builtin_nested(t_cmd_struct *tcst, int index, int *res)
+{
+	if (*res == 1)
+	{
+		ft_echo(tcst, index);
+		return (1);
+	}
+	else if (*res == 7)
+	{
+		ft_env(tcst);
+		return (1);
+	}
+	else if (*res == 8)
+	{
+		ft_pwd();
+		return (1);
+	}
+	return (0);
+}

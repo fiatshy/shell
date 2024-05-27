@@ -21,11 +21,11 @@ int	is_builtin(t_cmd_struct *tcst, int index)
 	else if (ft_strncmp("$?", tcst->tcmd[index]->arg[0], 2) == 0)
 		return (6);
 	else if (ft_strncmp("pwd", tcst->tcmd[index]->arg[0], 3) == 0)
-		return (1);
+		return (8);
 	else if (ft_strncmp("cd", tcst->tcmd[index]->arg[0], 3) == 0)
 		return (3);
 	else if (ft_strncmp("env", tcst->tcmd[index]->arg[0], 3) == 0)
-		return (1);
+		return (7);
 	else if (ft_strncmp("export", tcst->tcmd[index]->arg[0], 6) == 0)
 		return (4);
 	else if (ft_strncmp("unset", tcst->tcmd[index]->arg[0], 5) == 0)
