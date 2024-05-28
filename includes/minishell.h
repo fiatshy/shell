@@ -339,6 +339,16 @@ int		has_only_spaces(char *s);
 int		is_empty_command(char s);
 int		check_wrong_redirection(char *s);
 
+/* split_redir */
+int		check_redirect_kind(char *s);
+int		check_attached_redir(char *s);
+void	split_redir_front_token(char *s, char **split_second);
+void	split_redir_end_token(char *s, char **split_second);
+
+void	nested_nested(t_var nested, t_cmd_struct *tcst, int *index);
+void	move_split(char **split_first, t_cmd_struct *tcst);
+int		count_malloc_length(char **split_first);
+
 int		has_andor(t_cmd_struct *tcst);
 int		prepare_execute_nested_andor(t_cmd_struct *tcst, \
 			int i, int proceed, int cont);

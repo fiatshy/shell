@@ -80,3 +80,5 @@ int	main(void)
 		status = free_all(tcst);
 	}
 }
+
+//<a << b <c grep a >d >>e

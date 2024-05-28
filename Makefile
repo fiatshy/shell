@@ -16,6 +16,8 @@ SRCS_ARGUMENTS = arguments/arg_dollar_check.c \
 					arguments/arg_set.c \
 					arguments/arg_wild_check.c \
 					arguments/arg_wild_set.c \
+					arguments/split_redir.c \
+					arguments/split_redir_nested.c \
 
 SRCS_SPLIT = split/ft_split_first.c \
 				split/ft_split_first_nested.c \

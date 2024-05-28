@@ -74,11 +74,14 @@ int	handle_redirection_nested(t_cmd_struct *tcst, int j)
 {
 	t_var	nested;
 	int		index;
+	char	**split_first;
 
 	while (tcst->trst->split_redirection[j])
 	{
-		tcst->trst->split_again = \
-			ft_split(tcst->trst->split_redirection[j++], ' ');
+		split_first = ft_split(tcst->trst->split_redirection[j++], ' ');
+		tcst->trst->split_again = malloc (sizeof(char *) \
+			* (count_malloc_length(split_first) + 1));
+		move_split(split_first, tcst);
 		nested.k = 0;
 		index = 0;
 		nested.length = get_args_length(tcst->trst->split_again);
@@ -88,12 +91,7 @@ int	handle_redirection_nested(t_cmd_struct *tcst, int j)
 			&& tcst->trst->split_again[nested.k][0] == '<' && \
 			tcst->trst->split_again[nested.k][1] != '<')
 			return (-1);
-		while (tcst->trst->split_again[nested.k])
-		{
-			handle_again(tcst, nested.k, &index);
-			nested.k++;
-		}
-		free_again(tcst, nested.k);
+		nested_nested(nested, tcst, &index);
 	}
 	free_redirection(tcst, j);
 	return (0);
@@ -107,8 +105,9 @@ int	handle_redirection(t_cmd_struct *tcst, int i)
 	tcst->trst = malloc (sizeof(t_red_struct));
 	tcst->trst->split_redirection = ft_split(tcst->tcmd[i]->cmd, '=');
 	s = tcst->trst->split_redirection[0];
-	if (check_wrong_redirection(s) == -1)
-		return (-1);
+	(void) s;
+	//if (check_wrong_redirection(s) == -1)
+	//	return (-1);
 	j = 0;
 	tcst->trst->args = malloc (sizeof(char *) * 2);
 	if (handle_redirection_nested(tcst, j) == -1)

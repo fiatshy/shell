@@ -22,7 +22,8 @@ int	check_wrong_redirection(char *s)
 			{
 				if (*(s + 2) != ' ')
 				{
-					printf("Wrong Command\n");
+					printf("Wrong Command: \
+						redirect commands needs space between arguments\n");
 					return (-1);
 				}
 			}
@@ -30,7 +31,8 @@ int	check_wrong_redirection(char *s)
 			{
 				if (*(s + 1) != ' ')
 				{
-					printf("Wrong Command\n");
+					printf("Wrong Command: \
+						redirect commands needs space between arguments\n");
 					return (-1);
 				}
 			}
