@@ -167,6 +167,7 @@ void	handle_dollar_compare(char split_env[4][100], \
 int		has_asterisk(char *s);
 int		process_wildcard(char *f, char *t);
 int		how_much_files(char	*target);
+char	*what_quotes_arg(char *s);
 
 /* arg_wild_set */
 void	opendir_args(DIR **dp, struct dirent **entry);
@@ -284,6 +285,7 @@ void	ft_unset(t_cmd_struct *tcst, int index);
 /* builtin utils */
 int		is_builtin(t_cmd_struct *tcst, int index);
 int		exec_builtin(t_cmd_struct *tcst, int index);
+void	set_redirect_nested(t_cmd_struct *tcst, int *index, int k);
 
 /* misc */
 void	trim(t_cmd_struct *tcst, int index, int i);

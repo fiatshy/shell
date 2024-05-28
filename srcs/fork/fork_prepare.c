@@ -76,7 +76,10 @@ int	wait_for_child(t_cmd_struct *tcst)
 
 	i = -1;
 	while (++i < tcst->no_of_pipes)
+	{
 		close(tcst->tpipe[tcst->tcmd[i]->pipe_index].fd[0]);
+		close(tcst->tpipe[tcst->tcmd[i]->pipe_index].fd[1]);
+	}
 	i = -1;
 	temp = tcst->status;
 	while (++i < tcst->n)

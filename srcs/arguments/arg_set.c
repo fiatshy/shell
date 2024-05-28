@@ -18,6 +18,8 @@ int	has_only_spaces_check(char *s)
 	{
 		if (*s == '|')
 			return (1);
+		else if (*s == '&')
+			return (1);
 		if (*s != ' ')
 			return (0);
 		s++;

@@ -63,3 +63,16 @@ int	space_after_dollar(char *string)
 	}
 	return (0);
 }
+
+char	*what_quotes_arg(char *s)
+{
+	while (*s)
+	{
+		if (*s == '\'')
+			return ("\'");
+		else if (*s == '\"')
+			return ("\"");
+		s++;
+	}
+	return (NULL);
+}

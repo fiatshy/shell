@@ -30,11 +30,7 @@ void	set_redirect_args(t_cmd_struct *tcst, int *index, int k)
 		if (ft_strncmp(tcst->trst->split_again[k], "<", 1) \
 			&& ft_strncmp(tcst->trst->split_again[k], ">", 1))
 		{
-			tcst->trst->args[*index] = malloc \
-			(sizeof(ft_strlen(tcst->trst->split_again[k]) + 1));
-			ft_memcpy(tcst->trst->args[*index], \
-			tcst->trst->split_again[k], \
-			ft_strlen(tcst->trst->split_again[k]) + 1);
+			set_redirect_nested(tcst, index, k);
 			*index += 1;
 		}
 	}
