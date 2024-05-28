@@ -86,20 +86,3 @@ int	has_andor(t_cmd_struct *tcst)
 	}
 	return (0);
 }
-
-void	set_redirect_nested(t_cmd_struct *tcst, int *index, int k)
-{
-	char	*temp_str;
-	char	*delim;
-
-	delim = what_quotes_arg(tcst->trst->split_again[k]);
-	if (delim != NULL)
-		temp_str = ft_strtrim(tcst->trst->split_again[k], delim);
-	else
-		temp_str = tcst->trst->split_again[k];
-	tcst->trst->args[*index] = malloc \
-	(sizeof(ft_strlen(temp_str) + 1));
-	ft_memcpy(tcst->trst->args[*index], \
-	temp_str, \
-	ft_strlen(temp_str) + 1);
-}

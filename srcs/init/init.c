@@ -58,7 +58,8 @@ int	init_tcmd_nested(t_cmd_struct *tcst, char **split, char *temp, int i)
 {
 	if (tcst->tcmd[i]->next_delimiter != 0 && \
 			(split[1] == 0 || has_only_spaces_check(split[1]) == 1) && \
-			(*tcst->tcmd[i]->next_delimiter == '|' || *tcst->tcmd[i]->next_delimiter == '&'))
+			(*tcst->tcmd[i]->next_delimiter == '|' || \
+			*tcst->tcmd[i]->next_delimiter == '&'))
 	{
 		free(temp);
 		free(split[0]);
