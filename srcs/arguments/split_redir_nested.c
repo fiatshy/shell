@@ -52,6 +52,7 @@ void	move_split(char **split_first, t_cmd_struct *tcst)
 		}
 		i++;
 	}
+	tcst->trst->split_again[j] = 0;
 }
 
 void	nested_nested(t_var nested, t_cmd_struct *tcst, int *index)
