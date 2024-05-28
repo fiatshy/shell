@@ -1,0 +1,9 @@
+{
+	"makefile.launchConfigurations": [
+		{
+			"cwd": "/home/sunghyki/Downloads/shell",
+			"binaryPath": "/home/sunghyki/Downloads/shell/minishell",
+			"binaryArgs": []
+		}
+	]
+}
