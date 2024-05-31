@@ -106,8 +106,6 @@ int	handle_redirection(t_cmd_struct *tcst, int i)
 	tcst->trst->split_redirection = ft_split(tcst->tcmd[i]->cmd, '=');
 	s = tcst->trst->split_redirection[0];
 	(void) s;
-	//if (check_wrong_redirection(s) == -1)
-	//	return (-1);
 	j = 0;
 	tcst->trst->args = malloc (sizeof(char *) * 2);
 	if (handle_redirection_nested(tcst, j) == -1)
