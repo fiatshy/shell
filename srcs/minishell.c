@@ -41,12 +41,23 @@ static int	free_fail(t_cmd_struct *tcst)
 	return (temp);
 }
 
+static int	check_args(char *s)
+{
+	if (ft_strncmp(s, "&&", 3) == 0)
+		return (1);
+	else if (ft_strncmp(s, "()", 3) == 0)
+		return (1);
+	else if (*s == '(' || *s == ')' || *s == '|')
+		return (1);
+	return (0);
+}
+
 static int	main_nested(char *s)
 {
 	if (s == 0)
 		exit(0);
 	if (is_empty_command(s[0]) || has_only_spaces(s) \
-			|| is_empty_string(s) == 1)
+			|| is_empty_string(s) || check_args(s) == 1)
 		return (-1);
 	add_history(s);
 	return (0);
