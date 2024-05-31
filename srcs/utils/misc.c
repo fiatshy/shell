@@ -44,6 +44,7 @@ void	trim(t_cmd_struct *tcst, int index, int i)
 		else
 			printf("%s", tcst->tcmd[index]->arg[i]);
 	}
+	tcst->status = 0;
 }
 
 void	get_file_length(int *i)
