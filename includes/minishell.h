@@ -34,6 +34,7 @@ typedef struct s_cmd
 	bool	execute;
 	int		open;
 	int		close;
+	int		parenthesis[2];
 	int		no_of_redirection;
 	int		pipe_index;
 }		t_cmd;
@@ -98,6 +99,8 @@ typedef struct s_cmd_struct
 	t_fds			tfd[10];
 	t_red_struct	*trst;
 	struct s_pipe	tpipe[20];
+	int				open_index;
+	int				close_index;
 }		t_cmd_struct;
 
 typedef struct s_var

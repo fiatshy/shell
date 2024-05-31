@@ -32,6 +32,8 @@ void	init_tcst(t_cmd_struct **tcst, char *s, int status)
 	(*tcst)->tfd_index[2] = 0;
 	(*tcst)->tfd_index[3] = 0;
 	(*tcst)->builtin = 0;
+	(*tcst)->open_index = 0;
+	(*tcst)->close_index = 0;
 	init_fds(*tcst);
 }
 
@@ -43,15 +45,46 @@ void	free_init_tcmd(char **split, char *trim_str)
 	free(split);
 }
 
+void	set_open_value(t_cmd_struct *tcst, char *s, int i)
+{
+	while (*s)
+	{
+		if (*s == '(')
+		{
+			tcst->open_index = i;
+			tcst->close_index = i;
+			tcst->tcmd[tcst->open_index]->parenthesis[0] = i;
+		}
+		s++;
+	}
+}
+
+void	set_close_value(t_cmd_struct *tcst, char *s, int i)
+{
+	while (*s)
+	{
+		if (*s == ')')
+		{
+			tcst->tcmd[tcst->close_index]->parenthesis[1] = i;
+			tcst->close_index--;
+		}
+		s++;
+	}
+}
+
 void	init_tcmd_set_openclose(t_cmd_struct *tcst, char **split, int i)
 {
 	if (has_open_parenthesis(split[0]))
 	{
 		tcst->tcmd[i]->open = true;
+		set_open_value(tcst, split[0], i);
 		tcst->open = 1;
 	}
 	if (has_close_parenthesis(split[0]))
+	{
+		set_close_value(tcst, split[0], i);
 		tcst->tcmd[i]->close = true;
+	}
 }
 
 int	init_tcmd_nested(t_cmd_struct *tcst, char **split, char *temp, int i)
@@ -68,6 +101,8 @@ int	init_tcmd_nested(t_cmd_struct *tcst, char **split, char *temp, int i)
 		free(split);
 		return (-1);
 	}
+	tcst->tcmd[i]->parenthesis[0] = -1;
+	tcst->tcmd[i]->parenthesis[1] = -1;
 	init_tcmd_set_openclose(tcst, split, i);
 	return (0);
 }
@@ -98,5 +133,11 @@ int	init_tcmd(t_cmd_struct *tcst)
 		free_init_tcmd(split, trim_str);
 		i++;
 	}
+	// i = 0;
+	// while (i < tcst->n)
+	// {
+	// 	printf("%d = %d %d\n", i, tcst->tcmd[i]->parenthesis[0], tcst->tcmd[i]->parenthesis[1]);
+	// 	i++;
+	// }
 	return (0);
 }

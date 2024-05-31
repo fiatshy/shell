@@ -47,7 +47,11 @@ static int	check_args(char *s)
 		return (1);
 	else if (ft_strncmp(s, "()", 3) == 0)
 		return (1);
-	else if (*s == '(' || *s == ')' || *s == '|')
+	else if (ft_strncmp(s, "(", 2) == 0)
+		return (1);
+	else if (ft_strncmp(s, ")", 2) == 0)
+		return (1);
+	else if (ft_strncmp(s, "|", 2) == 0)
 		return (1);
 	return (0);
 }
