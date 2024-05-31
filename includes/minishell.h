@@ -312,6 +312,8 @@ void	free_child(t_cmd_struct *tcst);
 int		check_grouping_or(t_cmd_struct *tcst, int *i, int *proceed);
 int		check_grouping_and(t_cmd_struct *tcst, int *i, int *proceed);
 int		check_grouping(t_cmd_struct *tcst, int *i, int *proceed);
+void	set_close_value(t_cmd_struct *tcst, char *s, int i);
+void	set_open_value(t_cmd_struct *tcst, char *s, int i);
 
 /* free */
 int		free_all(t_cmd_struct *tcst);

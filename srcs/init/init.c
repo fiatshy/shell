@@ -45,33 +45,6 @@ void	free_init_tcmd(char **split, char *trim_str)
 	free(split);
 }
 
-void	set_open_value(t_cmd_struct *tcst, char *s, int i)
-{
-	while (*s)
-	{
-		if (*s == '(')
-		{
-			tcst->open_index = i;
-			tcst->close_index = i;
-			tcst->tcmd[tcst->open_index]->parenthesis[0] = i;
-		}
-		s++;
-	}
-}
-
-void	set_close_value(t_cmd_struct *tcst, char *s, int i)
-{
-	while (*s)
-	{
-		if (*s == ')')
-		{
-			tcst->tcmd[tcst->close_index]->parenthesis[1] = i;
-			tcst->close_index--;
-		}
-		s++;
-	}
-}
-
 void	init_tcmd_set_openclose(t_cmd_struct *tcst, char **split, int i)
 {
 	if (has_open_parenthesis(split[0]))
@@ -133,11 +106,5 @@ int	init_tcmd(t_cmd_struct *tcst)
 		free_init_tcmd(split, trim_str);
 		i++;
 	}
-	// i = 0;
-	// while (i < tcst->n)
-	// {
-	// 	printf("%d = %d %d\n", i, tcst->tcmd[i]->parenthesis[0], tcst->tcmd[i]->parenthesis[1]);
-	// 	i++;
-	// }
 	return (0);
 }
