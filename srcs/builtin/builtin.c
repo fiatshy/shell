@@ -61,8 +61,11 @@ void	ft_pwd(void)
 
 void	free_builtin(t_cmd_struct *tcst)
 {
-	free(tcst->tcmd[0]->arg[1]);
-	free(tcst->tcmd[0]->arg[0]);
+	int	i;
+	
+	i = 0;
+	while (tcst->tcmd[0]->arg[i])
+		free(tcst->tcmd[0]->arg[i++]);
 	free(tcst->tcmd[0]->arg);
 	ft_lstclear(tcst->lst_env, free);
 	free(tcst->lst_env);

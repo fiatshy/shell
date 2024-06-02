@@ -44,6 +44,7 @@ void	handle_exit(t_cmd_struct *tcst)
 {
 	int	length;
 	int	status;
+	int	i;
 
 	length = 0;
 	while (tcst->tcmd[0]->arg[length])
@@ -52,10 +53,14 @@ void	handle_exit(t_cmd_struct *tcst)
 		printf("too many variables\n");
 	else
 	{
-		status = ft_atoi(tcst->tcmd[0]->arg[1]);
+		if (length == 2)
+			status = ft_atoi(tcst->tcmd[0]->arg[1]);
+		else if (length < 2)
+			status = 0;
 		printf("exit\n");
-		free(tcst->tcmd[0]->arg[1]);
-		free(tcst->tcmd[0]->arg[0]);
+		i = 0;
+		while (tcst->tcmd[0]->arg[i])
+			free(tcst->tcmd[0]->arg[i++]);
 		free(tcst->tcmd[0]->arg);
 		ft_lstclear(tcst->lst_env, free);
 		free(tcst->lst_env);
