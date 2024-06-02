@@ -15,7 +15,7 @@
 int	is_builtin(t_cmd_struct *tcst, int index)
 {
 	if (ft_strncmp("echo", tcst->tcmd[index]->arg[0], 4) == 0)
-		return (1);
+		return (9);
 	else if (ft_strncmp("exit", tcst->tcmd[index]->arg[0], 4) == 0)
 		return (2);
 	else if (ft_strncmp("$?", tcst->tcmd[index]->arg[0], 2) == 0)

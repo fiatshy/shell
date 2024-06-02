@@ -4,6 +4,11 @@
       "cwd": "/home/sunghyki/Downloads/shell",
       "binaryPath": "/home/sunghyki/Downloads/shell/minishell",
       "binaryArgs": []
+    },
+    {
+      "cwd": "/home/fiatshy/shell",
+      "binaryPath": "/home/fiatshy/shell/minishell",
+      "binaryArgs": []
     }
   ],
   "C_Cpp_Runner.cCompilerPath": "gcc",

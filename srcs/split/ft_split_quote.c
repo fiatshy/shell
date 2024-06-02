@@ -47,11 +47,10 @@ char	**split_arr_quote(char **split, char const *s, char c)
 		if (*(s + i) != c)
 		{
 			j = count_length_quote(s, c, &i);
-			split[idx] = (char *) malloc (sizeof(char) * (j + 1));
-			if (split[idx] == 0)
-				return (0);
+			split[idx] = (char *) malloc (sizeof(char) * (j + 2));
 			ft_memcpy(split[idx], s + i - j, j);
 			split[idx][j] = '\0';
+			split[idx][j + 1] = '\0';
 			idx++;
 		}
 		else

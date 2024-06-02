@@ -52,6 +52,7 @@ void	handle_exit(t_cmd_struct *tcst)
 	else
 	{
 		printf("exit\n");
+		free(tcst->tcmd[0]->arg[1]);
 		free(tcst->tcmd[0]->arg[0]);
 		free(tcst->tcmd[0]->arg);
 		ft_lstclear(tcst->lst_env, free);

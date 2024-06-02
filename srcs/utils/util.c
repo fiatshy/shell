@@ -22,6 +22,8 @@ void	copy_string(t_cmd **tcmd, char *src, int len)
 void	copy_string_char(t_cmd_struct *tcst, char **s, char *src, int len)
 {
 	char	delim;
+	char	*temp;
+	char	d_str[2];
 
 	(*s) = malloc (len +1);
 	ft_memcpy((*s), src, len);
@@ -32,7 +34,15 @@ void	copy_string_char(t_cmd_struct *tcst, char **s, char *src, int len)
 	{
 		delim = (*s)[0];
 		if ((*s)[len - 1] == delim)
-			*s = ft_strtrim(*s, &delim);
+		{
+			d_str[0] = delim;
+			d_str[1] = 0;
+			temp = ft_strtrim(*s, d_str);
+			free(*s);
+			*s = malloc (ft_strlen(temp) + 1);
+			ft_memcpy(*s, temp, ft_strlen(temp) + 1);
+			free(temp);
+		}
 	}
 }
 

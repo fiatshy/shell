@@ -265,6 +265,7 @@ void	ft_echo(t_cmd_struct *tcst, int index);
 void	ft_exit(void);
 void	ft_status(t_cmd_struct *tcst);
 void	ft_pwd(void);
+void	free_builtin(t_cmd_struct *tcst);
 
 /* relative utils */
 int		find_slash_reverse(char *s, int target);

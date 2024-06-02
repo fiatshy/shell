@@ -56,7 +56,7 @@ void	move_split(char **split_first, t_cmd_struct *tcst)
 }
 
 void	nested_nested(t_var nested, t_cmd_struct *tcst, int *index)
-{	
+{
 	while (tcst->trst->split_again[nested.k])
 	{
 		handle_again(tcst, nested.k, index);

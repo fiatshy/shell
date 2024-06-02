@@ -25,10 +25,10 @@ void	fork_nested(int res, t_cmd_struct *tcst, int index)
 	char	*command;
 
 	env = NULL;
-	if (res == 1)
+	if (res == 1 || res == 9)
 	{
 		exec_builtin(tcst, index);
-		exit(0);
+		free_builtin(tcst);
 	}
 	else if (res == 0)
 	{
