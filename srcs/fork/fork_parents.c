@@ -43,6 +43,7 @@ int	handle_res_nested(int *res, t_cmd_struct *tcst, int index)
 void	handle_exit(t_cmd_struct *tcst)
 {
 	int	length;
+	int	status;
 
 	length = 0;
 	while (tcst->tcmd[0]->arg[length])
@@ -51,6 +52,7 @@ void	handle_exit(t_cmd_struct *tcst)
 		printf("too many variables\n");
 	else
 	{
+		status = ft_atoi(tcst->tcmd[0]->arg[1]);
 		printf("exit\n");
 		free(tcst->tcmd[0]->arg[1]);
 		free(tcst->tcmd[0]->arg[0]);
@@ -58,7 +60,7 @@ void	handle_exit(t_cmd_struct *tcst)
 		ft_lstclear(tcst->lst_env, free);
 		free(tcst->lst_env);
 		free_all(tcst);
-		exit(0);
+		exit(status);
 	}
 }
 
